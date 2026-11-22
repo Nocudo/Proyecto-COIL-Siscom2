@@ -1,0 +1,170 @@
+\subsection{Manual 3 (15\%): Self-Signed SSL/TLS PKI and Browser Trust Remediation (Bonus)}
+\label{subsec:manual3_pki}
+
+Modern browsers enforce RFC~5280 X.509v3 certificate chain validation~\cite{rfc5280} and reject simple self-signed leaf certificates that lack Subject Alternative Name (SAN) extensions or a trusted Root Certificate Authority (CA) anchor. To satisfy the mandatory HTTPS encryption requirement over TLS~1.3~\cite{rfc8446} while earning the bonus credit for eliminating browser security warnings (\texttt{NET::ERR\_CERT\_AUTHORITY\_INVALID}), a two-tier private Public Key Infrastructure (PKI) was engineered using OpenSSL~\cite{openssl2024}, as depicted in Figure~\ref{fig:pki_architecture}.
+
+\input{figuras/fig_pki_architecture}
+
+\subsubsection{Step 1: OpenSSL X.509v3 Configuration Policy (\texttt{openssl.cnf})}
+Create the OpenSSL configuration file \texttt{modulo2/certificados/openssl.cnf} defining two distinct X.509v3 extension profiles: \texttt{[v3\_ca]} for the offline Root CA (\texttt{basicConstraints = critical, CA:true}, \texttt{keyUsage = critical, digitalSignature, cRLSign, keyCertSign}) and \texttt{[server\_ext]} for the multi-tenant server leaf certificate (\texttt{basicConstraints = CA:FALSE}, \texttt{extendedKeyUsage = serverAuth, clientAuth}, and \texttt{subjectAltName = @alt\_names}). The SAN block binds all five DNS hostnames and four IPv4 addresses used across the SD-WAN overlay:
+
+\begin{lstlisting}[caption={X.509v3 Subject Alternative Name declaration in \texttt{openssl.cnf}.},label={lst:manual3_san}]
+[ server_ext ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+basicConstraints       = CA:FALSE
+keyUsage               = digitalSignature, keyEncipherment
+extendedKeyUsage       = serverAuth, clientAuth
+subjectAltName         = @alt_names
+
+[ alt_names ]
+DNS.1 = www.coil-group2.com
+DNS.2 = coil-group2.com
+DNS.3 = unillanos.coil-group2.com
+DNS.4 = seneca.coil-group2.com
+DNS.5 = localhost
+IP.1  = 172.22.201.2
+IP.2  = 172.22.31.69
+IP.3  = 10.51.76.174
+IP.4  = 127.0.0.1
+\end{lstlisting}
+
+\subsubsection{Step 2: Root CA Generation (\qty{3650}{days})}
+Generate the 2048-bit RSA private key (\texttt{ca-key.pem}) and self-sign the offline Root CA certificate (\texttt{ca-cert.pem} and \texttt{COIL\_Group2\_Root\_CA.crt}) using SHA-256 for a ten-year validity period:
+
+\begin{lstlisting}[caption={Generating the private 2048-bit RSA Root Certificate Authority.},label={lst:manual3_rootca}]
+openssl genrsa -out ca-key.pem 2048
+openssl req -x509 -new -nodes -key ca-key.pem -sha256 -days 3650 \
+  -out ca-cert.pem -config openssl.cnf -extensions v3_ca
+Copy-Item ca-cert.pem COIL_Group2_Root_CA.crt
+\end{lstlisting}
+
+\subsubsection{Step 3: Server Leaf Certificate Signing and Chain Bundling (\qty{825}{days})}
+Generate the server private key (\texttt{server-key.pem}), create the Certificate Signing Request (\texttt{server.csr}) using the \texttt{[server\_req]} profile, sign the leaf certificate (\texttt{server.crt}) for \qty{825}{days} (adhering to the Apple/Chromium maximum leaf lifetime limit), and concatenate the leaf and Root CA into \texttt{fullchain.pem}:
+
+\begin{lstlisting}[caption={Signing the SAN leaf certificate and building \texttt{fullchain.pem}.},label={lst:manual3_leaf}]
+openssl genrsa -out server-key.pem 2048
+openssl req -new -key server-key.pem -out server.csr \
+  -config openssl.cnf -reqexts server_ext
+openssl x509 -req -in server.csr -CA ca-cert.pem -CAkey ca-key.pem \
+  -CAcreateserial -out server.crt -days 825 -sha256 \
+  -extfile openssl.cnf -extensions server_ext
+Get-Content server.crt, ca-cert.pem | Set-Content fullchain.pem -Encoding ascii
+\end{lstlisting}
+
+Table~\ref{tab:pki_certificates} summarizes the live cryptographic attributes verified via \texttt{openssl x509 -in server.crt -noout -text} and Windows Certificate Store inspection.
+
+\begin{table*}[t]
+\centering
+\caption{Live Cryptographic Attributes of the COIL Group 2 Private PKI Hierarchy}
+\label{tab:pki_certificates}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Cryptographic Parameter} & \textbf{Tier 1: Offline Root CA (\texttt{COIL\_Group2\_Root\_CA.crt})} & \textbf{Tier 2: Server Leaf Certificate (\texttt{server.crt} / \texttt{fullchain.pem})} \\
+\midrule
+Subject Distinguished Name & \texttt{C=CO, ST=Meta, L=Villavicencio, O=COIL International Project, CN=COIL Group 2 Root CA} & \texttt{C=CO, ST=Meta, L=Villavicencio, O=UniLlanos \& Seneca Polytechnic, CN=www.coil-group2.com} \\
+Issuer Distinguished Name & \texttt{CN=COIL Group 2 Root CA} (Self-Signed Root Anchor) & \texttt{CN=COIL Group 2 Root CA} (Signed by Tier 1 Root Key) \\
+Public Key \& Signature & RSA \qty{2048}{\bit}, \texttt{sha256WithRSAEncryption} & RSA \qty{2048}{\bit}, \texttt{sha256WithRSAEncryption} \\
+Serial Number (Hex) & \texttt{1CB6CA4983D9BDB6F5CD48F319471E43769657D0} & \texttt{173DF529332DD2C5FF047CBF0AE1786A4B1487D7} \\
+Validity Window & Nov 21, 2026 20:26:18 GMT -- Nov 18, 2036 20:26:18 GMT (\qty{3650}{days}) & Nov 21, 2026 20:38:19 GMT -- Feb 23, 2029 20:38:19 GMT (\qty{825}{days}) \\
+X.509v3 Constraints \& Usage & \texttt{CA:TRUE} (critical), \texttt{digitalSignature, cRLSign, keyCertSign} & \texttt{CA:FALSE}, \texttt{digitalSignature, keyEncipherment}, \texttt{serverAuth, clientAuth} \\
+SHA-256 Fingerprint & \texttt{03:F5:C7:F3:3C:53:40:75:A1:D4:E3:CF:40:D0:4D:A8:BD:D3:A6:1F:44:59:76:89:66:69:C4:6E:AA:92:6E:E7} & \texttt{EE:F4:29:54:5D:89:F0:B2:2F:06:D4:8F:FC:C2:59:51:A4:0E:6B:B4:6F:87:E4:43:42:6B:4D:FE:22:10:1E:A3} \\
+Windows Store Thumbprint & \texttt{6C947986AF9F0C4782255C86F604A2D4D442E0D9} (\texttt{LocalMachine\textbackslash Root}, \texttt{CurrentUser\textbackslash Root}) & Served dynamically via TLS~1.3 \texttt{Certificate} handshake message (\texttt{0x1302}) \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\subsubsection{Step 4: Client Root CA Installation (Bonus Browser Trust Remediation)}
+To resolve the browser untrusted-authority error on client endpoints:
+\begin{enumerate}
+    \item \textbf{Windows Desktop Endpoints:} Execute \texttt{modulo2/\allowbreak certificados/\allowbreak install\_root\_ca.ps1} (or import into the machine store via elevated PowerShell, Listing~\ref{lst:manual3_import}) so Chromium (Google Chrome, Microsoft Edge) validates the chain automatically.
+    \item \textbf{Android Mobile Endpoints:} Navigate to \texttt{http://172.22.201.2/ca.crt} (or \texttt{https://www.coil-group2.com/ca.crt}), which serves \texttt{COIL\_Group2\_Root\_CA.crt} with MIME type \texttt{application/x-x509-ca-cert}, and install it under \textit{Settings $\to$ Security and privacy $\to$ More security settings $\to$ Install from device storage $\to$ CA certificate}.
+\end{enumerate}
+
+\begin{lstlisting}[caption={Importing the Root CA into Windows Trusted Root Certification Authorities.},label={lst:manual3_import}]
+Import-Certificate -FilePath "modulo2\certificados\COIL_Group2_Root_CA.crt" `
+  -CertStoreLocation "Cert:\LocalMachine\Root"
+Import-Certificate -FilePath "modulo2\certificados\COIL_Group2_Root_CA.crt" `
+  -CertStoreLocation "Cert:\CurrentUser\Root"
+\end{lstlisting}
+
+Figures~\ref{fig:cert_chrome_trusted}, \ref{fig:cert_viewer}, and~\ref{fig:cert_mobile} verify the complete elimination of certificate warnings across both desktop and mobile platforms. Figure~\ref{fig:cert_chrome_trusted} shows Google Chrome on Windows navigating to \texttt{https://www.coil-group2.com/seneca/} with the security popover confirming a trusted, encrypted connection (\textit{La conexi\'{o}n es segura}). Figure~\ref{fig:cert_viewer} displays the native X.509 Certificate Viewer confirming issuance to \texttt{www.coil-group2.com} by \texttt{COIL Group 2 Root CA}. Figure~\ref{fig:cert_mobile} confirms cross-device HTTPS access on an Android smartphone (Samsung Galaxy S24+) over the active ZeroTier VPN tunnel.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{figuras/cert_chrome_trusted_fresh.png}
+\caption{Live Google Chrome verification on Windows navigating to \texttt{https://www.coil-group2.com/seneca/} with the site security panel open, demonstrating trusted HTTPS status and zero certificate warnings after Root CA installation (bonus objective).}
+\label{fig:cert_chrome_trusted}
+\end{figure*}
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.90\textwidth]{figuras/cert_viewer_details_fresh.png}
+\caption{Native X.509 Certificate Viewer inspection confirming the validated trust chain from \texttt{COIL Group 2 Root CA} to leaf certificate \texttt{www.coil-group2.com} with SHA-256 RSA-2048 signatures and SAN extensions.}
+\label{fig:cert_viewer}
+\end{figure*}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.58\columnwidth]{figuras/cert_mobile_android.jpg}
+\caption{Cross-platform mobile verification on Android (Samsung Galaxy S24+, ZeroTier VPN active in status bar) accessing \texttt{www.coil-group2.com/unillanos/} over TLS~1.3 with the Root CA installed.}
+\label{fig:cert_mobile}
+\end{figure}
+
+\subsection{Manual 4 (15\%): Authoritative and Forwarding DNS Server Configuration}
+\label{subsec:manual4_dns}
+
+To enable seamless domain-based navigation (\texttt{www.coil-group2.com/unillanos/} and \texttt{www.coil-group2.com/seneca/}) across all SD-WAN nodes without relying solely on manual IP entry, a dedicated Python DNS daemon (\texttt{modulo2/dns/dns\_server.py}) was implemented using the \texttt{dnslib} packet engine in compliance with RFC~1034~\cite{rfc1034}, RFC~1035~\cite{rfc1035}, and RFC~2308~\cite{rfc2308}. Figure~\ref{fig:dns_flowchart} illustrates the server's four-way packet-processing pipeline and host integration parameters.
+
+\input{figuras/fig_dns_flowchart}
+
+\subsubsection{Step 1: Authoritative Zone and RFC 2308 Negative Caching Engine}
+The DNS daemon binds \texttt{UDP 0.0.0.0:53} (disabling Windows UDP connection-reset exceptions via \texttt{SIO\_UDP\_CONNRESET = False}) and maintains an authoritative dictionary mapping all four project hostnames (\texttt{www.coil-group2.com}, \texttt{coil-group2.com}, \texttt{unillanos.coil-group2.com}, and \texttt{seneca.coil-group2.com}) to \texttt{172.22.201.2} with a \qty{300}{\second} TTL:
+\begin{itemize}
+    \item \textbf{Type \texttt{A} (1) and \texttt{ANY} (255) Queries:} Returns an authoritative \texttt{NOERROR} answer with \texttt{AA=1} and \texttt{rdata=A("172.22.201.2")}.
+    \item \textbf{Type \texttt{AAAA} (28) and \texttt{HTTPS} (65) Queries (\texttt{NODATA+SOA}):} Modern Chromium and Android (\texttt{netd}) resolvers issue parallel \texttt{AAAA} and \texttt{HTTPS} queries alongside \texttt{A} lookups. Under RFC~2308~\cite{rfc2308}, returning an empty answer section without an Authority \texttt{SOA} record causes Android \texttt{netd} to abort with \texttt{FORMERR}. The server therefore appends \texttt{SOA("ns.coil-group2.com", "admin.coil-group2.com", (2026112101, 3600, 600, 86400, 300))} in the authority section.
+    \item \textbf{Unregistered Subdomains (\texttt{NXDOMAIN+SOA}):} Queries matching \texttt{*.coil-group2.com} outside the authoritative dictionary receive \texttt{RCODE.NXDOMAIN} with the authoritative \texttt{SOA} record.
+    \item \textbf{External Internet Queries:} Non-COIL domains are forwarded over UDP to Google Public DNS (\texttt{8.8.8.8:53}, \qty{2.0}{\second} timeout) and relayed transparently back to the client.
+\end{itemize}
+
+\subsubsection{Step 2: Windows Port 53 Binding, Firewall Rules, and Headless Persistence}
+On Windows 11, the Internet Connection Sharing service (\texttt{SharedAccess}) can reserve UDP port 53. Free port 53, open inbound firewall rules (\texttt{COIL\_DNS\_53}), and register the headless Scheduled Task (\texttt{COIL\_DNS\_Daemon} under \texttt{S4U} logon):
+
+\begin{lstlisting}[caption={Provisioning UDP port 53, firewall rules, and persistent S4U DNS daemon.},label={lst:manual4_service}]
+Stop-Service SharedAccess -Force -ErrorAction SilentlyContinue
+New-NetFirewallRule -DisplayName "COIL_DNS_53" -Direction Inbound `
+  -Protocol UDP -LocalPort 53 -Action Allow
+$action = New-ScheduledTaskAction -Execute "python.exe" `
+  -Argument '-u "modulo2\dns\dns_server.py"'
+$principal = New-ScheduledTaskPrincipal -UserId (whoami) `
+  -LogonType S4U -RunLevel Highest
+Register-ScheduledTask -TaskName "COIL_DNS_Daemon" -Action $action `
+  -Principal $principal -Force
+Start-ScheduledTask -TaskName "COIL_DNS_Daemon"
+\end{lstlisting}
+
+\subsubsection{Step 3: ZeroTier DNS Push and Client Verification}
+In ZeroTier Central (Figure~\ref{fig:zerotier_settings}), configure \texttt{SERVERS: 172.22.201.2} under the DNS panel. On Android clients, enable \textit{Use Network DNS} inside the ZeroTier One app and set Android \textit{Private DNS} to \textit{Off} so DNS-over-TLS does not bypass the SD-WAN resolver; on Windows clients without ZeroTier DNS push enabled, execute \texttt{modulo2/dns/setup\_hosts.ps1} as a deterministic local fallback. Live verification from both \texttt{172.22.201.2} and remote gateway \texttt{172.22.31.69} confirmed authoritative \texttt{A} and \texttt{SOA} resolution:
+
+\begin{lstlisting}[caption={Live authoritative DNS verification for Type A and Type AAAA queries.},label={lst:manual4_verify}]
+PS C:\> Resolve-DnsName www.coil-group2.com -Server 172.22.201.2 -Type A
+Name                 Type   TTL   Section    IPAddress
+----                 ----   ---   -------    ---------
+www.coil-group2.com  A      300   Answer     172.22.201.2
+
+PS C:\> Resolve-DnsName www.coil-group2.com -Server 172.22.201.2 -Type AAAA
+Name             Type  TTL  Section    PrimaryServer       NameAdministrator     SerialNumber
+----             ----  ---  -------    -------------       -----------------     ------------
+coil-group2.com  SOA   300  Authority  ns.coil-group2.com  admin.coil-group2.com 2026112101
+\end{lstlisting}
+
+Figure~\ref{fig:ws_dns} presents the live Wireshark dissection of Frames~1 and~2 captured on the ZeroTier virtual adapter (\texttt{dns} display filter), confirming transaction ID \texttt{0x9121}, authoritative flag \texttt{AA=1}, resolved address \texttt{172.22.201.2} (\texttt{TTL = 300 s}), and a round-trip resolution latency of \qty{0.5346}{\milli\second}.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{figuras/wireshark_5_dns_resolution.png}
+\caption{Wireshark protocol dissection of the live SD-WAN DNS query and authoritative response (Frames~1--2, Transaction ID \texttt{0x9121}, \qty{0.5346}{\milli\second} RTT) resolving \texttt{www.coil-group2.com} to \texttt{172.22.201.2} over UDP port 53.}
+\label{fig:ws_dns}
+\end{figure*}

@@ -1,0 +1,267 @@
+\begin{figure*}[htbp]
+\centering
+\definecolor{ztInk}{HTML}{0F172A}
+\definecolor{ztMuted}{HTML}{475569}
+\definecolor{ztCtrlBg}{HTML}{F5F0FF}
+\definecolor{ztCtrlLine}{HTML}{6D28D9}
+\definecolor{ztCtrlDark}{HTML}{4C1D95}
+\definecolor{ztUniBg}{HTML}{EFF6FF}
+\definecolor{ztUniLine}{HTML}{1D4ED8}
+\definecolor{ztUniDark}{HTML}{1E3A8A}
+\definecolor{ztSenBg}{HTML}{ECFDF5}
+\definecolor{ztSenLine}{HTML}{047857}
+\definecolor{ztSenDark}{HTML}{064E3B}
+\definecolor{ztCliBg}{HTML}{FFF7ED}
+\definecolor{ztCliLine}{HTML}{C2410C}
+\definecolor{ztCliDark}{HTML}{7C2D12}
+\definecolor{ztSumBg}{HTML}{F8FAFC}
+\definecolor{ztSumLine}{HTML}{64748B}
+\definecolor{ztMeshLine}{HTML}{334155}
+
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    zone box/.style={
+        draw=#1, line width=0.85pt, dashed, rounded corners=6pt, inner sep=6pt
+    },
+    zone hdr/.style={
+        font=\scriptsize\bfseries, text=#1, inner xsep=2pt, inner ysep=1.5pt
+    },
+    card frame/.style={
+        draw=#1, line width=0.85pt, rounded corners=4pt, inner sep=4pt, fill=white
+    },
+    card pill/.style={
+        fill=#1, text=white, font=\scriptsize\bfseries,
+        rounded corners=2.5pt, inner xsep=5pt, inner ysep=3pt, align=flush left
+    },
+    card body/.style={
+        font=\fontsize{6.8}{9.2}\selectfont, text=ztInk, align=flush left,
+        inner xsep=3pt, inner ysep=2.5pt
+    },
+    p2p link/.style={
+        {Stealth[length=5pt,width=4pt]}-{Stealth[length=5pt,width=4pt]},
+        line width=1.35pt, shorten >=1.5pt, shorten <=1.5pt
+    },
+    mesh stub/.style={
+        -{Stealth[length=4.5pt,width=3.5pt]},
+        line width=1.0pt, color=ztMeshLine, shorten >=1.5pt, shorten <=0pt
+    },
+    ctrl link/.style={
+        -{Stealth[length=4.5pt,width=3.5pt]},
+        line width=0.85pt, densely dashed, color=ztCtrlLine,
+        rounded corners=4pt, shorten >=1.5pt, shorten <=1pt
+    },
+    edge badge/.style={
+        draw=#1, fill=white, line width=0.65pt, rounded corners=3pt,
+        font=\fontsize{6.4}{8.6}\selectfont, text=ztInk, align=center,
+        inner xsep=4pt, inner ysep=3pt
+    },
+    ctrl tag/.style={
+        fill=white, text=ztCtrlDark, font=\fontsize{6}{8.0}\selectfont\bfseries,
+        inner xsep=3pt, inner ysep=1.5pt, rounded corners=2pt
+    }
+]
+
+\node[card pill=ztUniDark, text width=4.65cm, anchor=north west] (n1_hdr) at (0,0)
+    {Node 1: UniLlanos Primary Host};
+\node[card body, text width=4.65cm, below=2pt of n1_hdr.south, anchor=north] (n1_body) {%
+    \textbf{Miguel Rodriguez - Unillanos Website Server}\\
+    ID: \texttt{AED30A4FDD} (\texttt{aed30a4fdd})\\
+    OS: Windows 11 (\texttt{x86\_64})\\
+    ZeroTier IP: \texttt{172.22.201.2/16}\\
+    Physical IP: \texttt{181.51.34.123}\\
+    Services: \texttt{server\_https.py} (TCP \texttt{443} TLS 1.3 \& TCP \texttt{80}),
+    \texttt{dns\_server.py} (UDP \texttt{53}), Private Root CA (\texttt{COIL Group 2 Root CA})%
+};
+\begin{pgfonlayer}{cardbg}
+    \node[card frame=ztUniLine, fit=(n1_hdr)(n1_body)] (node1) {};
+\end{pgfonlayer}
+\node[zone hdr=ztUniDark, anchor=south west] (uni_hdr) at ($(node1.north west) + (0, 3pt)$)
+    {UNILLANOS HOST ZONE};
+\begin{pgfonlayer}{zonebg}
+    \node[zone box=ztUniLine, fill=ztUniBg, fit=(uni_hdr)(node1)] (uni_zone) {};
+\end{pgfonlayer}
+
+\node[card pill=ztCliDark, text width=4.15cm, below=2.9cm of node1.south west, anchor=north west] (n3_hdr)
+    {Node 3: Partner Student PC};
+\node[card body, text width=4.15cm, below=2pt of n3_hdr.south, anchor=north] (n3_body) {%
+    \textbf{Luis Alejandro Leon - Student Client}\\
+    ID: \texttt{B63D8AEBA8} (\texttt{b63d8aeba8})\\
+    OS: Windows (\texttt{x86\_64})\\
+    ZeroTier IPs: \texttt{172.22.100.11}, \texttt{172.22.164.74}\\
+    Physical IP: \texttt{181.51.34.104}%
+};
+
+\node[card pill=ztCliDark, text width=3.8cm, right=0.55cm of n3_hdr.north east, anchor=north west] (n4_hdr)
+    {Node 4: Partner Mobile Client};
+\node[card body, text width=3.8cm, below=2pt of n4_hdr.south, anchor=north] (n4_body) {%
+    \textbf{Luis Alejandro Leon - Student Client}\\
+    ID: \texttt{F6FCD4CE4D} (\texttt{f6fcd4ce4d})\\
+    OS: Android (\texttt{arm64})\\
+    ZeroTier IP: \texttt{172.22.100.10}%
+};
+
+\node[card pill=ztCliDark, text width=4.15cm, right=0.55cm of n4_hdr.north east, anchor=north west] (n5_hdr)
+    {Node 5: Mobile Verification Client};
+\node[card body, text width=4.15cm, below=2pt of n5_hdr.south, anchor=north] (n5_body) {%
+    \textbf{Miguel Rodriguez - Student Client}\\
+    ID: \texttt{8EB3130D2C} (\texttt{8eb3130d2c})\\
+    OS: Android (\texttt{arm64})\\
+    ZeroTier IPs: \texttt{172.22.38.108}, \texttt{172.22.201.50}%
+};
+
+\path let \p1=(n3_body.south), \p2=(n4_body.south), \p3=(n5_body.south) in
+    coordinate (cli_bot) at (0, {min(\y1, min(\y2, \y3))});
+\begin{pgfonlayer}{cardbg}
+    \node[card frame=ztCliLine, fit=(n3_hdr)(n3_body)(n3_hdr |- cli_bot)] (node3) {};
+    \node[card frame=ztCliLine, fit=(n4_hdr)(n4_body)(n4_hdr |- cli_bot)] (node4) {};
+    \node[card frame=ztCliLine, fit=(n5_hdr)(n5_body)(n5_hdr |- cli_bot)] (node5) {};
+\end{pgfonlayer}
+\node[zone hdr=ztCliDark, anchor=south west] (cli_hdr) at ($(node3.north west) + (0, 3pt)$)
+    {REMOTE CLIENTS ZONE};
+\begin{pgfonlayer}{zonebg}
+    \node[zone box=ztCliLine, fill=ztCliBg, fit=(cli_hdr)(node3)(node4)(node5)] (cli_zone) {};
+\end{pgfonlayer}
+
+\node[card pill=ztSenDark, text width=4.65cm, anchor=north east] (n2_hdr) at (n1_hdr.north -| n5_hdr.east)
+    {Node 2: Seneca Partner Gateway};
+\node[card body, text width=4.65cm, below=2pt of n2_hdr.south, anchor=north] (n2_body) {%
+    \textbf{Seneca College - Simulated Gateway}\\
+    ID: \texttt{1C84E39095} (\texttt{1c84e39095})\\
+    OS: Windows 11 (\texttt{x86\_64})\\
+    ZeroTier IP: \texttt{172.22.31.69/16}\\
+    Physical IP: \texttt{181.51.34.123}\\
+    Services: \texttt{server\_https.py} (TCP \texttt{443} TLS 1.3 \& TCP \texttt{80})\\
+    Hosts: Seneca Intranet (\texttt{/seneca/})%
+};
+\path let \p1=(n1_body.south), \p2=(n2_body.south) in
+    coordinate (srv_bot) at (0, {min(\y1, \y2)});
+\begin{pgfonlayer}{cardbg}
+    \node[card frame=ztSenLine, fit=(n2_hdr)(n2_body)(n2_hdr |- srv_bot)] (node2) {};
+\end{pgfonlayer}
+\node[zone hdr=ztSenDark, anchor=south west] (sen_hdr) at ($(node2.north west) + (0, 3pt)$)
+    {SENECA GATEWAY ZONE};
+\begin{pgfonlayer}{zonebg}
+    \node[zone box=ztSenLine, fill=ztSenBg, fit=(sen_hdr)(node2)] (sen_zone) {};
+\end{pgfonlayer}
+
+\node[card body, text width=7.95cm, anchor=south west] (ctrl_c_body) at ($(node1.west |- uni_zone.north) + (0, 1.05cm)$) {%
+    \textbf{Network ID:} \texttt{abfd31bd47affa39} \;\textbar\; \textbf{Subnet:} \texttt{172.22.0.0/16} \;\textbar\; \textbf{MTU:} \qty{1300}{\byte}\\
+    \textbf{Overlay Transport:} Virtual Ethernet L2/L3 Mesh over UDP port \texttt{9993}%
+};
+\node[card pill=ztCtrlDark, text width=7.95cm, anchor=south] (ctrl_c_hdr) at ($(ctrl_c_body.north) + (0, 2pt)$)
+    {ZeroTier Central Controller (\texttt{my.zerotier.com})};
+
+\node[card pill=ztCtrlDark, text width=4.65cm, anchor=north east] (ctrl_p_hdr) at (ctrl_c_hdr.north -| n2_hdr.east)
+    {Planet Root Servers};
+\node[card body, text width=4.65cm, below=2pt of ctrl_p_hdr.south, anchor=north] (ctrl_p_body) {%
+    \textbf{Root IDs:} \texttt{778cde7190}, \texttt{cafe80ed74}\\
+    Peer Discovery, NAT Traversal \& Relay%
+};
+
+\path let \p1=(ctrl_c_body.south), \p2=(ctrl_p_body.south) in
+    coordinate (ctrl_bot) at (0, {min(\y1, \y2)});
+\begin{pgfonlayer}{cardbg}
+    \node[card frame=ztCtrlLine, fit=(ctrl_c_hdr)(ctrl_c_body)(ctrl_c_hdr |- ctrl_bot)] (ctrl_central) {};
+    \node[card frame=ztCtrlLine, fit=(ctrl_p_hdr)(ctrl_p_body)(ctrl_p_hdr |- ctrl_bot)] (ctrl_planet) {};
+\end{pgfonlayer}
+\node[zone hdr=ztCtrlDark, anchor=south west] (ctrl_hdr) at ($(ctrl_central.north west) + (0, 3pt)$)
+    {CONTROL PLANE \& UNDERLAY DISCOVERY};
+\begin{pgfonlayer}{zonebg}
+    \node[zone box=ztCtrlLine, fill=ztCtrlBg, fit=(ctrl_hdr)(ctrl_central)(ctrl_planet)] (ctrl_zone) {};
+\end{pgfonlayer}
+
+\coordinate (top_mid) at ($(ctrl_zone.north west)!0.5!(ctrl_zone.north east)$);
+\node[font=\normalsize\bfseries, text=ztInk, anchor=south] (figtitle) at ($(top_mid) + (0, 0.38cm)$)
+    {COIL Group 2 ZeroTier SD-WAN Overlay Topology};
+
+\coordinate (c_n1_x) at ($(n1_hdr.north east) - (0.65cm, 0)$);
+\draw[ctrl link] (ctrl_zone.south -| c_n1_x) -- (node1.north -| c_n1_x);
+\node[ctrl tag] at ($(ctrl_zone.south -| c_n1_x)!0.5!(uni_zone.north -| c_n1_x)$) {Auth \& Config};
+
+\coordinate (c_n2_x) at ($(n2_hdr.north east) - (0.65cm, 0)$);
+\draw[ctrl link] (ctrl_zone.south -| c_n2_x) -- (node2.north -| c_n2_x);
+\node[ctrl tag] at ($(ctrl_zone.south -| c_n2_x)!0.5!(sen_zone.north -| c_n2_x)$) {Auth \& Key Dist.};
+
+\coordinate (ctrl_rail_x) at ($(sen_zone.east) + (0.45cm, 0)$);
+\draw[ctrl link] (ctrl_zone.east) -- (ctrl_zone.east -| ctrl_rail_x) |- (cli_zone.east);
+\node[ctrl tag, align=center] at ($(ctrl_rail_x |- sen_zone.south)!0.5!(ctrl_rail_x |- cli_zone.north)$)
+    {Control /\\[1pt]STUN};
+
+\coordinate (lan_mid) at ($(node1.east)!0.5!(node2.west)$);
+\draw[p2p link, color=ztSenLine] (node1.east) -- (node2.west);
+\node[edge badge=ztSenLine, above=5pt of lan_mid, anchor=south, text width=3.15cm] (lan_top) {%
+    \textbf{LAN ZeroTier P2P}\\
+    \texttt{192.168.10.x:9993}%
+};
+\node[edge badge=ztSenLine, below=5pt of lan_mid, anchor=north, text width=3.15cm] (lan_bot) {%
+    ICMP avg: \qty{10}{\milli\second} (rev. \qty{6}{\milli\second})\\
+    DNS latency: \qty{0.53}{\milli\second}%
+};
+
+\coordinate (wan_x) at ($(node3.north east) - (0.35cm, 0)$);
+\draw[p2p link, color=ztUniLine] (node1.south -| wan_x) -- (node3.north -| wan_x);
+\coordinate (wan_mid) at ($(uni_zone.south -| wan_x)!0.5!(cli_zone.north -| wan_x)$);
+\node[edge badge=ztUniLine, left=5pt of wan_mid, anchor=east, text width=3.65cm] (wan_lbl) {%
+    \textbf{WAN ZeroTier P2P} (\texttt{181.51.34.104:20594})\\
+    ICMP avg: \qty{31}{\milli\second} / \qty{23}{\milli\second} (\qty{0}{\percent} loss)%
+};
+
+\coordinate (mesh_y) at ($(uni_zone.south)!0.50!(cli_zone.north)$);
+\coordinate (mesh_x1) at ($(node1.south east) - (0.30cm, 0)$);
+\coordinate (mesh_x4) at (node4.north);
+\coordinate (mesh_x5) at (node5.north);
+
+\draw[line width=1.1pt, color=ztMeshLine] (mesh_x1 |- mesh_y) -- (mesh_x5 |- mesh_y);
+\foreach \mx in {mesh_x1, mesh_x4, mesh_x5} {
+    \fill[ztMeshLine] (\mx |- mesh_y) circle (1.7pt);
+}
+\draw[mesh stub] (mesh_x1 |- mesh_y) -- (node1.south -| mesh_x1);
+\draw[mesh stub] (mesh_x5 |- mesh_y) -- (node2.south -| mesh_x5);
+\draw[mesh stub] (mesh_x4 |- mesh_y) -- (node4.north);
+\draw[mesh stub] (mesh_x5 |- mesh_y) -- (node5.north);
+
+\node[edge badge=ztMeshLine, text width=4.3cm] at ($(mesh_x4 |- mesh_y)!0.5!(mesh_x5 |- mesh_y)$) {%
+    \textbf{Virtual Ethernet L2/L3 Mesh}\\
+    \texttt{172.22.0.0/16} \textbar\ UDP \texttt{9993} \textbar\ MTU \qty{1300}{\byte}%
+};
+
+\path let \p1=(cli_zone.west), \p2=(cli_zone.east) in
+    node[draw=ztSumLine, fill=ztSumBg, rounded corners=4pt, inner xsep=6pt, inner ysep=5pt,
+         text width={(\x2-\x1)-12.85pt}, align=center,
+         font=\fontsize{6.6}{9.5}\selectfont, text=ztInk, anchor=north west]
+    (sum_bar) at ($(cli_zone.south west) + (0, -0.32cm)$) {%
+        {\fontsize{6.6}{9.6}\selectfont
+        \textbf{Verified Overlay Summary:}~
+        Network \texttt{abfd31bd47affa39} (\texttt{172.22.0.0/16}, MTU \qty{1300}{\byte})
+        \;\textbar\;
+        \textbf{LAN P2P:} \qty{10}{\milli\second} / rev. \qty{6}{\milli\second}, DNS \qty{0.53}{\milli\second}\\[2pt]
+        \textbf{WAN P2P:} \qty{31}{\milli\second} / \qty{23}{\milli\second} (\qty{0}{\percent} loss)
+        \;\textbar\;
+        \textbf{Security Stack:} TLS 1.3 (TCP \texttt{443}) + \texttt{COIL Group 2 Root CA}\par}%
+    };
+
+\matrix[ampersand replacement=\&, below=0.22cm of sum_bar.south, anchor=north, column sep=7pt, inner sep=0pt,
+        nodes={font=\fontsize{6.5}{8.6}\selectfont, text=ztMuted, inner sep=1pt, anchor=west}] (legend_mat) {
+    \node[font=\fontsize{6.5}{8.6}\selectfont\bfseries, text=ztInk] {Legend:}; \&
+    \node[draw=ztCtrlLine, fill=ztCtrlBg, minimum width=0.28cm, minimum height=0.22cm, rounded corners=1pt] {}; \&
+    \node {Control Plane}; \&
+    \node[draw=ztUniLine, fill=ztUniBg, minimum width=0.28cm, minimum height=0.22cm, rounded corners=1pt] {}; \&
+    \node {UniLlanos Host}; \&
+    \node[draw=ztSenLine, fill=ztSenBg, minimum width=0.28cm, minimum height=0.22cm, rounded corners=1pt] {}; \&
+    \node {Seneca Gateway}; \&
+    \node[draw=ztCliLine, fill=ztCliBg, minimum width=0.28cm, minimum height=0.22cm, rounded corners=1pt] {}; \&
+    \node {Remote Clients}; \&
+    \node[minimum width=0.45cm, minimum height=0.2cm] (leg_c) {}; \&
+    \node {Control Signaling}; \&
+    \node[minimum width=0.45cm, minimum height=0.2cm] (leg_p) {}; \&
+    \node {P2P / Mesh Link}; \\
+};
+\draw[ctrl link, shorten >=0pt, shorten <=0pt] (leg_c.west) -- (leg_c.east);
+\draw[p2p link, color=ztSenLine, shorten >=0pt, shorten <=0pt] (leg_p.west) -- (leg_p.east);
+
+\end{tikzpicture}%
+}
+\caption{COIL Group 2 ZeroTier SD-WAN overlay network architecture (\texttt{abfd31bd47affa39}, \texttt{172.22.0.0/16}, MTU \qty{1300}{\byte}). The control plane (\texttt{my.zerotier.com} and Planet root servers) coordinates cryptographic authorization and NAT traversal over UDP/9993, interconnecting the UniLlanos primary server (\texttt{172.22.201.2}), the Seneca Polytechnic gateway (\texttt{172.22.31.69}), and partner desktop/mobile clients.}
+\label{fig:sdwan_topology}
+\end{figure*}

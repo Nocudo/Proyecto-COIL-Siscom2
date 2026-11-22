@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniLlanos Intranet - COIL Cultural &amp; Engineering Exchange</title>
+  <style>
+    :root {
+      --primary: #c2410c;
+      --primary-dark: #9a3412;
+      --accent: #f59e0b;
+      --bg-dark: #0a0f1d;
+      --card-bg: #141e33;
+      --card-border: #233554;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --green-badge: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+    header {
+      background: linear-gradient(135deg, #141e33 0%, #0a0f1d 100%);
+      border-bottom: 2px solid var(--primary);
+      padding: 0.55rem 1.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .nav-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: white;
+      box-shadow: 0 0 12px rgba(194, 65, 12, 0.4);
+    }
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.9rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text-main); }
+    .btn-partner {
+      background: #dc2626;
+      color: white !important;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600 !important;
+      transition: all 0.2s ease;
+      box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+    }
+    .btn-partner:hover {
+      background: #b91c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 14px rgba(220, 38, 38, 0.5);
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 1.5rem 1.75rem;
+    }
+    .hero {
+      background: linear-gradient(rgba(10, 15, 29, 0.65), rgba(10, 15, 29, 0.9)), url('img/villavicencio_panorama.jpg') center/cover;
+      border-radius: 16px;
+      padding: 2.5rem 1.75rem 2rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--card-border);
+      text-align: center;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.5);
+    }
+    .hero h2 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    }
+    .hero p {
+      font-size: 1.05rem;
+      color: #e2e8f0;
+      max-width: 850px;
+      margin: 0 auto 1.25rem auto;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.8);
+    }
+    .telemetry-bar {
+      display: inline-flex;
+      background: rgba(20, 30, 51, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      gap: 1.25rem;
+      border: 1px solid var(--primary);
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    }
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--green-badge);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green-badge);
+    }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 1.75rem;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+      border-color: var(--primary);
+    }
+    .card-img-wrap {
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      background: #1e293b;
+      position: relative;
+    }
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .card:hover .card-img {
+      transform: scale(1.06);
+    }
+    .card-body {
+      padding: 1.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      flex: 1;
+      line-height: 1.6;
+    }
+    .team-section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      padding: 3rem 2.5rem;
+      margin-bottom: 4rem;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .team-member {
+      background: #0d1527;
+      border-radius: 16px;
+      padding: 2rem;
+      border: 1px solid var(--card-border);
+      display: flex;
+      gap: 1.5rem;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+    .team-member:hover {
+      border-color: var(--primary);
+    }
+    .team-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center 20%;
+      border: 3px solid var(--primary);
+      flex-shrink: 0;
+      box-shadow: 0 4px 15px rgba(194, 65, 12, 0.4);
+    }
+    .team-info h4 {
+      font-size: 1.2rem;
+      margin-bottom: 0.25rem;
+    }
+    .team-role {
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 0.65rem;
+      font-weight: 600;
+    }
+    .team-bio {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 0.5rem 1rem;
+      }
+      .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+      }
+      .brand {
+        justify-content: flex-start;
+      }
+      .nav-links {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        gap: 0.65rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-links a {
+        white-space: nowrap;
+        font-size: 0.78rem;
+      }
+      .btn-partner {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 0.35rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+      }
+      .container {
+        padding: 1rem 0.75rem;
+      }
+      .hero {
+        padding: 1.75rem 1rem 1.5rem;
+        margin-bottom: 1.75rem;
+        border-radius: 12px;
+      }
+      .hero h2 {
+        font-size: 1.6rem;
+        line-height: 1.25;
+      }
+      .hero p {
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+      .telemetry-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+        width: 100%;
+      }
+      .telemetry-item {
+        font-size: 0.78rem;
+      }
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+      }
+      .card-img-wrap {
+        height: 200px;
+      }
+      .card-body {
+        padding: 1.25rem;
+      }
+      .team-section {
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 2.5rem;
+        border-radius: 14px;
+      }
+      .team-grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+      }
+      .team-member {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">UL</div>
+        <div class="brand-text">
+          <h1>Universidad de los Llanos</h1>
+          <p>Facultad de Ciencias B&aacute;sicas e Ingenier&iacute;a &bull; Ingenier&iacute;a Electr&oacute;nica</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#gastronomy">Gastronomy</a>
+        <a href="#festivals">Culture &amp; Joropo</a>
+        <a href="#nature">Ca&ntilde;o Cristales &amp; Campus</a>
+        <a href="#team">Our Team</a>
+        <a href="/seneca/" class="btn-partner">Switch to Seneca Intranet &rarr;</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <h2>Welcome to UniLlanos Intranet</h2>
+      <p>Gateway to the Colombian Eastern Plains (Villavicencio, Meta). Connected via Software-Defined WAN over ZeroTier and secured with X.509 TLS 1.3 encryption to Seneca Polytechnic in Toronto, Canada.</p>
+      
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <span class="status-dot"></span>
+          <span><strong>Host:</strong> Miguel Rodriguez - Unillanos Website Server</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>ZeroTier IP:</strong> 172.22.201.2</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>Domain:</strong> www.coil-group2.com/unillanos/</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>Protocol:</strong> HTTPS TLS 1.3 (Port 443)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GASTRONOMY SECTION -->
+    <section id="gastronomy">
+      <h3 class="section-title">Authentic Llanero Gastronomy</h3>
+      <div class="grid">
+        
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/Carne-a-la-llanera.webp" alt="Carne a la Llanera Mamona" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Traditional Culinary Art</span>
+            <h4 class="card-title">Carne a la Llanera (Mamona)</h4>
+            <p class="card-desc">The undisputed culinary emblem of the Colombian plains. Prime beef cuts are skewered onto tall wooden stakes and slow-roasted for hours circling open wood-fire embers. The crispy exterior and tender meat paired with boiled yuca and fried plantains is the centerpiece of every Sunday gathering and regional wedding.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/caldo_costilla.webp" alt="Caldo de Costilla" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Morning Vitality</span>
+            <h4 class="card-title">Caldo de Costilla</h4>
+            <p class="card-desc">The essential dawn recovery dish. A steaming broth slow-simmered with beef ribs, potatoes, garlic, cilantro, and spring onions. Served piping hot at roadside asaderos to greet the sunrise after vibrant festival celebrations.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/hayaca.webp" alt="Hayaca Llanera" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Festive Heritage</span>
+            <h4 class="card-title">Hayaca Llanera</h4>
+            <p class="card-desc">An artisanal delicacy made with seasoned corn dough filled with tender beef, pork, chicken, vegetables, and aromatic spices, wrapped carefully in smoked plantain leaves and gently steamed to lock in rich, earthy aromas.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CULTURE AND FESTIVALS SECTION -->
+    <section id="festivals">
+      <h3 class="section-title">Cultural Heritage, Music &amp; Landscape</h3>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/20260816_143153.jpg" alt="Torneo del Joropo y Joropódromo" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Folklore &amp; Dance</span>
+            <h4 class="card-title">Torneo del Joropo &amp; Jorop&oacute;dromo</h4>
+            <p class="card-desc">Villavicencio's premier cultural spectacle. Thousands of dancing couples parade along the avenues in vibrant ruffled gowns and traditional hats, performing lightning-fast synchronized foot-stomping (zapateo) driven by the driving rhythm of the llanero harp, cuatro, and maracas.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/panoramica_llanos.jpg" alt="Panorámica de los Llanos" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Endless Savannas</span>
+            <h4 class="card-title">Sunsets of the Orinoco Basin</h4>
+            <p class="card-desc">The plains of Meta extend towards the Orinoco River, famous worldwide for dramatic crimson and golden sunsets against silhouette moriche palm corridors and open grazing lands where llanero cowboy heritage thrives.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/villavicencio_panorama.jpg" alt="Villavicencio City View" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Gateway to the Plains</span>
+            <h4 class="card-title">Villavicencio Metropolis</h4>
+            <p class="card-desc">Nestled precisely where the dramatic Eastern Andes foothills descend into the endless tropical savannas. A thriving educational and economic capital combining modern infrastructure with deep agrarian roots.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ECOTOURISM & CAMPUS SECTION -->
+    <section id="nature">
+      <h3 class="section-title">Ca&ntilde;o Cristales &amp; University Campus</h3>
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/cano_cristales.jpg" alt="Caño Cristales el Río de Colores" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Natural Wonder of the World</span>
+            <h4 class="card-title">Ca&ntilde;o Cristales: River of Five Colors</h4>
+            <p class="card-desc">Located in the Serran&iacute;a de la Macarena, Meta. Between July and November, blooming endemic aquatic plants (<em>Macarenia clavigera</em>) turn the riverbed into vibrant shades of red, fuchsia, yellow, green, and blue, hailed globally as the most beautiful river on Earth.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/unillanos_campus.jpg" alt="Universidad de los Llanos Campus" class="card-img">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Biodiverse Academic Sanctuary</span>
+            <h4 class="card-title">UniLlanos Barcelona Campus</h4>
+            <p class="card-desc">Unlike concrete-heavy urban universities, Universidad de los Llanos is embedded directly into protected natural forest corridors. It is everyday life to spot free-roaming iguanas, primates, and tropical birds while walking between telecommunications and electronics laboratories.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TEAM SECTION -->
+    <section id="team" class="team-section">
+      <h3 class="section-title">UniLlanos Engineering Team</h3>
+      <div class="team-grid">
+        
+        <div class="team-member">
+          <img src="img/miguel_rodriguez.jpg" alt="Miguel Rodriguez" class="team-avatar">
+          <div class="team-info">
+            <h4>Miguel &Aacute;ngel Rodr&iacute;guez Payares</h4>
+            <div class="team-role">10th Semester &bull; Electronic Engineering</div>
+            <p class="team-bio">Specializing in embedded systems, microcontroller firmware, network security, and 3D CAD parametric modeling. Lead server architect for this COIL SD-WAN deployment.</p>
+          </div>
+        </div>
+
+        <div class="team-member">
+          <img src="img/alejandro_leon.jpg" alt="Luis Alejandro Leon" class="team-avatar">
+          <div class="team-info">
+            <h4>Luis Alejandro Le&oacute;n Vel&aacute;squez</h4>
+            <div class="team-role">9th Semester &bull; Electronic Engineering (English C1)</div>
+            <p class="team-bio">Passionate about systems development, circuit design, and microcontroller automation. Dedicated mindset with international academic exchange experience in Mexico.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>COIL International Collaboration Project &bull; Seneca Polytechnic (Toronto) &amp; Universidad de los Llanos (Villavicencio)</p>
+    <p>Secure SD-WAN Intranet &bull; TLS 1.3 Self-Signed PKI Infrastructure</p>
+  </footer>
+
+</body>
+</html>

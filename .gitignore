@@ -1,0 +1,31 @@
+# Raw unedited camera takes (>100 MB GitHub file limit)
+modulo2/video/grabaciones/
+
+# LaTeX build artifacts and auxiliary files
+modulo2/informe/dist/
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini

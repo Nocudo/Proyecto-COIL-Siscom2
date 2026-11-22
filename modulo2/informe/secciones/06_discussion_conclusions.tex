@@ -1,0 +1,111 @@
+\section{Quantitative Engineering Analysis and Discussion}
+\label{sec:discussion}
+
+Rather than reiterating the provisioning procedures or raw telemetry tables documented in the preceding sections, this section evaluates cross-layer performance deviations against theoretical protocol baselines and diagnoses the physical and operating-system failure modes encountered during live SD-WAN deployment. Table~\ref{tab:quantitative_comparison} synthesizes the six governing engineering metrics measured across the ZeroTier overlay, authoritative DNS daemon, TLS~1.3 transport stack, and Wireshark forensic capture.
+
+\begin{table*}[t]
+\centering
+\caption{Cross-Layer Quantitative Comparison: Theoretical Baselines vs.\ Live Measured SD-WAN Telemetry and Relative Deviation}
+\label{tab:quantitative_comparison}
+\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{1.24}
+\begin{tabularx}{\textwidth}{@{}
+  >{\hsize=0.72\hsize\raggedright\arraybackslash}X
+  >{\hsize=0.96\hsize\raggedright\arraybackslash}X
+  >{\hsize=1.18\hsize\raggedright\arraybackslash}X
+  >{\hsize=1.14\hsize\raggedright\arraybackslash}X
+  @{}}
+\toprule
+\textbf{Metric / Subsystem} & \textbf{Theoretical / Spec.\ Baseline} & \textbf{Live Measured SD-WAN Value} & \textbf{Relative Deviation / Overhead} \\
+\midrule
+\textbf{Maximum Segment Size (MSS)} &
+Standard Ethernet (\qty{1500}{\byte} MTU $\rightarrow$ \qty{1460}{\byte} MSS)~\cite{rfc9293,tanenbaum2021} &
+Tuned ZeroTier overlay (\qty{1300}{\byte} MTU $\rightarrow$ \qty{1260}{\byte} MSS in Frames~3--4) &
+$-\qty{13.70}{\percent}$ intentional reduction (\qty{200}{\byte} encapsulation headroom preventing cellular/PPPoE fragmentation) \\
+\addlinespace[4pt]
+\textbf{LAN P2P Overlay Latency} &
+Direct Gigabit Ethernet ($\approx \qty{0.50}{\milli\second}$ RTT) &
+ZeroTier UDP-9993 P2P tunnel (\qty{6.0}{\milli\second}--\qty{10.0}{\milli\second} avg.\ ICMP RTT; \qty{14.21}{\milli\second} TCP \texttt{SYN}/\texttt{SYN-ACK}) &
+$+\qty{5.5}{\milli\second}$ to $+\qty{9.5}{\milli\second}$ over bare LAN due to overlay encryption and user-space TUN/TAP processing~\cite{zerotier2024} \\
+\addlinespace[4pt]
+\textbf{WAN P2P Overlay Latency} &
+ZeroTier LAN overlay baseline (\qty{10.0}{\milli\second} avg.\ RTT) &
+Partner ISP WAN leaf (\nolinkurl{172.22.100.11} / \nolinkurl{172.22.164.74}: \qty{23.0}{\milli\second}--\qty{31.0}{\milli\second} avg.\ ICMP RTT, \qty{0}{\percent} loss) &
+$+\qty{13.0}{\milli\second}$ to $+\qty{21.0}{\milli\second}$ Internet routing propagation delta across cross-ISP underlay hops \\
+\addlinespace[4pt]
+\textbf{Authoritative DNS Lookup} &
+Local OS cache / \texttt{hosts} lookup ($< \qty{0.10}{\milli\second}$) &
+Live remote \texttt{dnslib} UDP-53 query (\qty{0.5346}{\milli\second} in Frame~2) &
+Sub-millisecond SD-WAN name resolution (\qty{0.27}{\percent} of \qty{200}{\milli\second} interactive budget)~\cite{rfc1035,kurose2017} \\
+\addlinespace[4pt]
+\textbf{TLS~1.3 + TCP Wire Overhead} &
+Plaintext HTTP payload (\qty{15470}{\byte} Seneca HTML; \qty{15734}{\byte} with HTTP headers) &
+\qty{22785}{\byte} bidirectional wire bytes across 36 TCP/TLS frames (\num{19135} server seq.\ bytes; \qty{19134}{\byte} TCP payload) &
+\qty{47.29}{\percent} total framing + TLS~1.3 1-RTT handshake/AEAD record overhead (\qty{7315}{\byte} delta over HTML payload)~\cite{rfc8446} \\
+\addlinespace[4pt]
+\textbf{PCAP Deliverable vs.\ Limit} &
+Rubric upper cap (\qty{10.0}{\mega\byte} = \qty{10240}{\kilo\byte}) &
+Captured \nolinkurl{coil_sdwan_https_traffic.pcapng} (\qty{24.81}{\kilo\byte} = \qty{25408}{\byte}) &
+\qty{99.76}{\percent} safety margin below cap (\qty{0.24}{\percent} budget utilization)~\cite{wireshark2023} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+\subsection{Cross-Layer Framing, Latency Cascade, and Wire-Byte Accounting}
+\label{subsec:cross_layer_analysis}
+
+Tuning the ZeroTier virtual interface MTU from the Ethernet standard of \qty{1500}{\byte} down to \qty{1300}{\byte} lowers the negotiated TCP Maximum Segment Size (MSS) observed in Frames~3--4 of \nolinkurl{coil_sdwan_https_traffic.pcapng} according to
+\begin{equation}
+\Delta_{\text{MSS}} = \frac{1260 - 1460}{1460} \times \qty{100}{\percent} = -\qty{13.70}{\percent},
+\label{eq:mss_delta}
+\end{equation}
+subtracting \qty{40}{\byte} of combined IPv4 (\qty{20}{\byte}) and TCP (\qty{20}{\byte}) header overhead from each bound~\cite{rfc9293}. This deliberate \qty{200}{\byte} encapsulation margin prevents Path MTU Discovery (PMTUD) blackholing and outer IP fragmentation when ZeroTier Virtual Layer~1 (VL1) wraps each virtual frame inside outer IPv4/UDP-9993 headers and cryptographic framing over residential PPPoE DSL links (\qty{1492}{\byte} MTU) or cellular carrier tunnels~\cite{kozierok2005,zerotier2024}. On the virtual wire itself, per-segment L2--L4 payload efficiency shifts only slightly from $1460/1514 = \qty{96.43}{\percent}$ on bare Ethernet to $1260/1314 = \qty{95.89}{\percent}$ on the overlay (a \qty{0.54}{\percent} per-frame efficiency trade-off), representing an advantageous compromise for heterogeneous WAN traversal.
+
+Across the time domain, comparing Table~\ref{tab:icmp_rtt} with the live packet capture isolates each layer's latency contribution. While direct Gigabit Ethernet achieves $\approx \qty{0.50}{\milli\second}$ round-trip times, local ZeroTier P2P forwarding (\texttt{172.22.201.2} $\leftrightarrow$ \texttt{172.22.31.69}) adds $+\qty{5.5}{\milli\second}$ to $+\qty{9.5}{\milli\second}$ (\qty{6.0}{\milli\second}--\qty{10.0}{\milli\second} average ICMP RTT), reflecting user-space TUN/TAP context switches and per-packet tunnel encryption~\cite{zerotier2024}. The TCP \texttt{SYN} to \texttt{SYN-ACK} handshake in Frames~3--4 measures \qty{14.21}{\milli\second}, incorporating socket-buffer allocation alongside the overlay RTT. Extending across public residential ISPs (\texttt{181.51.34.123} to \texttt{181.51.34.104} toward \nolinkurl{172.22.100.11} and \nolinkurl{172.22.164.74}) contributes an additional $+\qty{13.0}{\milli\second}$ to $+\qty{21.0}{\milli\second}$ propagation and queueing delta (\qty{23.0}{\milli\second}--\qty{31.0}{\milli\second} average ICMP RTT) with \qty{0}{\percent} packet loss. Meanwhile, remote UDP-53 resolution of \nolinkurl{www.coil-group2.com} via \texttt{dns\_server.py} (Frames~1--2) completes in \qty{0.5346}{\milli\second}---consuming just \qty{0.27}{\percent} of a \qty{200}{\milli\second} interactive latency budget and avoiding multi-hop recursive root lookups~\cite{forouzan2013,kurose2017}.
+
+At the cryptographic and transport layers, dissecting the 36 TCP/TLS frames (Frames~3--38, \texttt{tcp.stream == 0}) accounts exactly for every wire byte. Delivering the \qty{15470}{\byte} Seneca HTML document (\nolinkurl{modulo2/sitio_web/seneca/index.html}) with HTTP/1.1 headers from \texttt{COIL-DualIntranet/2.0} produces \qty{15734}{\byte} of plaintext application data (\qty{264}{\byte} HTTP metadata)~\cite{rfc9110}. Over the encrypted TCP stream, the server transmits \qty{19134}{\byte} of TCP payload (advancing relative sequence numbers to \num{19135} prior to \texttt{FIN}, verified by \texttt{Ack=19136} in Frame~36) and the client sends \qty{1683}{\byte} (TLS~1.3 \texttt{ClientHello} with SNI, \texttt{Finished}, and the encrypted \texttt{GET} request), totaling \qty{20817}{\byte} of bidirectional TCP payload. Adding Ethernet/IPv4/TCP headers across the 36 frames ($34 \times \qty{54}{\byte} + 2 \times \qty{66}{\byte} = \qty{1968}{\byte}$, including \qty{12}{\byte} of TCP options in Frames~3--4) yields \qty{22785}{\byte} on the wire. Relative to the raw HTML resource, the single-session protocol and 1-RTT TLS~1.3 handshake/AEAD record overhead is
+\begin{equation}
+\delta_{\text{wire}} = \frac{22785 - 15470}{15470} \times \qty{100}{\percent} = \qty{47.29}{\percent},
+\label{eq:wire_overhead}
+\end{equation}
+corresponding to a \qty{7315}{\byte} total protocol delta (\qty{264}{\byte} HTTP headers, \qty{5083}{\byte} TLS~1.3 handshake/certificate/AEAD framing and client request, and \qty{1968}{\byte} L2--L4 headers). Because the 1-RTT TLS~1.3 handshake and X.509 chain transmission represent a fixed per-connection cost~\cite{rfc8446,rfc5280}, session resumption or larger multimedia transfers rapidly amortize this overhead toward the baseline AEAD and L2--L4 framing floor. Finally, the \qty{24.81}{\kilo\byte} (\qty{25408}{\byte}) trace file occupies only
+\begin{equation}
+U_{\text{pcap}} = \frac{\qty{24.8125}{\kilo\byte}}{\qty{10240}{\kilo\byte}} \times \qty{100}{\percent} = \qty{0.24}{\percent}
+\label{eq:pcap_util}
+\end{equation}
+of the \qty{10.0}{\mega\byte} rubric limit, preserving a \qty{99.76}{\percent} size margin.
+
+\subsection{Root-Cause Troubleshooting and Deployment Failure Modes}
+\label{subsec:troubleshooting}
+
+Transitioning the SD-WAN from local desktop prototypes to multi-device Windows and Android operation uncovered five subtle cross-layer failure modes. Each discrepancy required protocol-level or operating-system root-cause isolation rather than superficial configuration retries:
+
+\begin{enumerate}
+    \item \textbf{Search Domain Suffix Loop and Android Private DNS Bypass:} Initially populating ZeroTier Central's \textit{Search Domain} field with \texttt{coil-group2.com} caused Android \texttt{netd} and Chromium stub resolvers to append the search suffix onto already-qualified queries, synthesizing malformed FQDNs (\nolinkurl{www.coil-group2.com.coil-group2.com}) and triggering \texttt{DNS\_PROBE\_STARTED} failures~\cite{rfc1034,rfc1035}. Simultaneously, Android Private DNS (DNS-over-TLS on TCP port~853) bypassed ZeroTier's pushed UDP-53 server (\texttt{172.22.201.2}) by sending queries directly to public DoT resolvers. Clearing the Search Domain field in ZeroTier Central while retaining \texttt{172.22.201.2} as the managed DNS server, alongside temporarily disabling Android Private DNS on mobile test clients, restored deterministic SD-WAN resolution.
+
+    \item \textbf{Missing RFC~2308 Authority SOA on Authoritative \texttt{NODATA} Replies:} Even after valid \texttt{A} answers were served, Android \texttt{netd} rejected queries for \nolinkurl{www.coil-group2.com} with internal \texttt{FORMERR} errors. Dual-stack mobile resolvers emit concurrent \texttt{Type~1 (A)}, \texttt{Type~28 (AAAA)}, and \texttt{Type~65 (HTTPS)} service-binding queries~\cite{rfc1035}. When early DNS logic returned empty packets (zero Answer and zero Authority sections) for unsupported \texttt{AAAA} and \texttt{HTTPS} queries, strict stub validators classified the empty replies as malformed rather than valid negative answers. Injecting an explicit authoritative \texttt{SOA\_RECORD} (\texttt{ns.coil-group2.com}, \texttt{admin.coil-group2.com}) via \texttt{reply.add\_auth()} in \nolinkurl{modulo2/dns/dns_server.py} for both \texttt{NODATA} and \texttt{NXDOMAIN} paths achieved strict RFC~2308 compliance~\cite{rfc2308}.
+
+    \item \textbf{Windows Winsock \texttt{TCP RST} on \texttt{shutdown(SHUT\_WR)} and Unread Buffers:} Early HTTPS tests intermittently aborted with \texttt{ERR\_CONNECTION\_CLOSED} due to server-emitted \texttt{TCP RST} segments. Python's standard \texttt{socketserver.TCPServer} calls \texttt{socket.shutdown(socket.SHUT\_WR)} inside \texttt{shutdown\_request()} prior to closing; on Windows Winsock2, issuing \texttt{SHUT\_WR} or closing an underlying socket while unread TLS \texttt{close\_notify} alert bytes remain in the kernel receive buffer triggers an immediate \texttt{TCP RST} instead of a graceful four-way teardown~\cite{rfc9293,rfc8446}. In \nolinkurl{modulo2/servidor/server_https.py}, \texttt{DualIntranetHandler} enforces \texttt{Connection: close} (\texttt{self.close\_connection = True}), while \texttt{NonBlockingSSLThreadingServer} overrides \texttt{process\_request\_thread} to perform TLS wrapping inside worker threads and terminate directly via \texttt{close\_request()} without premature \texttt{SHUT\_WR}. Frames~35--38 of the final capture confirm a clean \texttt{FIN,ACK}/\texttt{ACK}/\texttt{FIN,ACK}/\texttt{ACK} closure with zero \texttt{RST} frames.
+
+    \item \textbf{Headless \texttt{pythonw.exe} Null \texttt{sys.stderr} and SSH Job-Object Termination:} Attempting background execution with \texttt{pythonw.exe} crashed \texttt{server\_https.py} upon the first client request because detached GUI-subsystem processes set \texttt{sys.stderr} to \texttt{None}, causing \texttt{DualIntranetHandler.log\_message()} to raise an \texttt{AttributeError} on \texttt{sys.stderr.write()}. Conversely, launching standard \texttt{python.exe} over remote OpenSSH sessions bound the daemon to an interactive Windows Job Object flagged with \nolinkurl{JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE}, terminating both web and DNS services immediately upon SSH exit. Hosting both daemons under Windows Task Scheduler with \texttt{S4U} non-interactive logon running \texttt{python.exe} headlessly eliminated Job-Object teardown while preserving valid I/O streams.
+
+    \item \textbf{Windows Schannel Revocation Check Failures (\texttt{CRYPT\_E\_NO\_\allowbreak REVOCATION\_CHECK}):} Following installation of \nolinkurl{COIL_Group2_Root_CA.crt}, desktop Chromium and Android browsers validated the leaf SAN chain immediately without warnings. However, native Windows WinHTTP/Schannel CLI probes (e.g., \texttt{curl.exe}) failed because the offline OpenSSL policy (\nolinkurl{modulo2/certificados/openssl.cnf}) omits live CRL Distribution Points and OCSP Authority Information Access (AIA) URLs~\cite{rfc5280,openssl2024}. Passing \texttt{--ssl-no-revoke} in automated Schannel diagnostic scripts bypassed offline revocation lookups while preserving cryptographic signature and SAN verification against the trusted Root CA.
+\end{enumerate}
+
+\section{Conclusions and Future Work}
+\label{sec:conclusions}
+
+This engineering project fulfilled all four measurable objectives established in Section~\ref{sec:introduction}, validating an end-to-end encrypted international SD-WAN and dual-intranet architecture across Windows and Android endpoints:
+
+\begin{enumerate}
+    \item \textbf{Private SD-WAN Overlay Interconnection:} Five endpoints (\num{3} active Windows hosts and \num{2} Android handsets, \num{0} unauthorized devices) were interconnected over ZeroTier network \texttt{abfd31bd47affa39} (\texttt{172.22.0.0/16}) at a tuned \qty{1300}{\byte} MTU (\qty{1260}{\byte} MSS, $-\qty{13.70}{\percent}$ vs.\ Ethernet). Live telemetry achieved \qty{0}{\percent} packet loss across desktop P2P links, with \qty{6.0}{\milli\second}--\qty{10.0}{\milli\second} LAN RTT and \qty{23.0}{\milli\second}--\qty{31.0}{\milli\second} cross-ISP WAN RTT.
+
+    \item \textbf{Dual Cultural Intranets over TLS~1.3 and Private PKI:} The threaded \texttt{COIL-DualIntranet/2.0} server delivered both the Universidad de los Llanos and Seneca Polytechnic portals (\qty{15470}{\byte} Seneca HTML payload) under TLS~1.3 (\nolinkurl{TLS_AES_256_GCM_SHA384}, 1-RTT) anchored to \texttt{COIL Group 2 Root CA}. Installing the 2048-bit Root CA eliminated all browser security warnings on Windows and Android clients, incurring a quantified \qty{47.29}{\percent} single-session wire overhead (\qty{22785}{\byte} bidirectional total vs.\ \qty{15470}{\byte} raw HTML).
+
+    \item \textbf{Authoritative SD-WAN DNS Resolution:} The RFC~1035 and RFC~2308 compliant \texttt{dnslib} daemon (\texttt{dns\_server.py}) resolved \nolinkurl{www.coil-group2.com} and institutional subdomains over UDP port~53 with \texttt{NODATA+SOA} negative-caching compliance, achieving \qty{0.5346}{\milli\second} live SD-WAN lookup latency (\qty{0.27}{\percent} of a \qty{200}{\milli\second} interactive UX budget) and eliminating raw IP navigation.
+
+    \item \textbf{Wireshark Packet Forensics Within Rubric Constraints:} Dissection of \nolinkurl{coil_sdwan_https_traffic.pcapng} (\qty{24.81}{\kilo\byte} = \qty{25408}{\byte}) consumed just \qty{0.24}{\percent} of the \qty{10.0}{\mega\byte} limit (\qty{99.76}{\percent} margin), empirically verifying \qty{1260}{\byte} MSS negotiation, a \qty{14.21}{\milli\second} TCP handshake, encrypted TLS~1.3 payload delivery, and a zero-\texttt{RST} four-way \texttt{FIN} teardown across Frames~35--38.
+\end{enumerate}
+
+As targeted future enhancements, three architectural upgrades would elevate the platform toward production carrier standards: (1)~hosting an internal OCSP responder or static CRL endpoint referenced in \nolinkurl{openssl.cnf} AIA extensions~\cite{rfc5280} so strict WinHTTP/Schannel clients validate certificates without \texttt{--ssl-no-revoke}; (2)~upgrading \texttt{COIL-DualIntranet/2.0} to HTTP/2 (\texttt{h2} ALPN) with TLS~1.3 PSK session resumption~\cite{rfc8446,rfc9110} to multiplex embedded cultural imagery and amortize the \qty{7315}{\byte} 1-RTT setup overhead; and (3)~enabling ZeroTier deterministic IPv6 \texttt{6PLANE} addressing alongside \texttt{AAAA} records in \texttt{dns\_server.py} to eliminate dual-stack \texttt{NODATA} queries on mobile carrier networks.

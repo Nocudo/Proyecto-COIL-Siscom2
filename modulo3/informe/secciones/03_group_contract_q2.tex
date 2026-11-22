@@ -1,0 +1,54 @@
+\subsection{Question 2: Group Contract Comparison and Reflection (2.5\%)}
+
+\begin{tcolorbox}[
+    colback=LightPanel,
+    colframe=BorderGray,
+    boxrule=0.7pt,
+    arc=3pt,
+    left=9pt,
+    right=9pt,
+    top=6pt,
+    bottom=6pt
+]
+\textbf{Prompt:} \textit{``Compare what you have completed in the project to the original Group Contract that was signed. Was the group contract followed? Please elaborate and reflect on why the contract was or wasn't followed.''}
+\end{tcolorbox}
+
+To answer honestly and directly: \textbf{no, the original bilateral Group Contract was not followed, because it was never formally signed or put into effect with our Seneca Polytechnic counterparts.} From the initial launch of the COIL exchange, our assigned Canadian teammates never responded to outreach messages or joined any planning touchpoints. Consequently, a shared cross-institutional agreement governing meeting schedules, communication response windows, and joint deliverables could not be negotiated or signed.
+
+Faced with complete silence from the partner side, Luis Alejandro Le\'on Vel\'asquez and I faced a clear risk of leaving critical dependencies---specifically the authoritative DNS server and Seneca's cultural intranet---unbuilt. Rather than allowing an unexecuted contract to block our progress on Module~2 (which carries 80\% of the project grade), we established an informal internal working agreement within Universidad de los Llanos. Under this contingency pact, we preserved 100\% of the technical objectives defined in the course guide by reallocating Seneca's unfulfilled responsibilities to ourselves and documenting every step transparently.
+
+Table~\ref{tab:contract_comparison} contrasts the original bilateral project governance model envisioned by the COIL activity against what our UniLlanos sub-team actually executed.
+
+\begin{table}[H]
+\centering
+\caption{Comparison Between the Planned Bilateral Group Contract Model and Actual Execution.}
+\label{tab:contract_comparison}
+\small
+\begin{tabularx}{\textwidth}{@{} >{\bfseries\raggedright\arraybackslash}p{2.7cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{2.7cm} @{}}
+\toprule
+\textbf{Project Element} & \textbf{Planned Bilateral Contract} & \textbf{Actual Execution (UniLlanos)} & \textbf{Outcome} \\
+\midrule
+Signed Group Contract & Jointly negotiated rules, roles, and meeting cadence across both schools & Never signed due to zero Seneca contact; replaced by internal UniLlanos pact & Not Followed (Contingency Used) \\
+\addlinespace[4pt]
+ZeroTier SD-WAN Mesh & At least one PC per student across Seneca and UniLlanos & Miguel host (\texttt{172.22.201.2}), Alejandro client (\texttt{172.22.100.10}), simulated gateway (\texttt{172.22.31.69}), mobile & Completed Internally \\
+\addlinespace[4pt]
+Authoritative DNS Server & Configured and operated by Seneca students & Designed and deployed in Python (\texttt{dnslib}) by Miguel on UDP~53 & Reallocated \& Completed \\
+\addlinespace[4pt]
+Cultural Intranet Sites & UniLlanos builds Colombian site; Seneca builds Canadian site & UniLlanos built both \texttt{/unillanos/} and \texttt{/seneca/} portals with authentic research & Reallocated \& Completed \\
+\addlinespace[4pt]
+HTTPS, PKI \& Bonus Trust & Self-signed TLS required; trusted Root CA optional bonus & Full OpenSSL Root CA + SAN certs installed in OS trust stores (zero warnings) & Completed + Bonus Met \\
+\addlinespace[4pt]
+Wireshark, Report \& Videos & Joint English technical report and individual member videos & Full \SI{19.3}{\kilo\byte} PCAP, 4~packet figures, 4~manuals, and UniLlanos individual demos & Completed by UniLlanos \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Reflecting critically on \textit{why} the Group Contract was never signed or followed reveals three structural root causes common to international virtual exchanges:
+
+\begin{enumerate}[leftmargin=1.4em, itemsep=4pt]
+    \item \textbf{Absence of a Verified Week~1 Synchronous Kickoff:} Without a mandatory live video orientation where both sides confirm active course enrollment, verify email or messaging handles, and co-sign the contract in real time, asynchronous outreach fails silently. Once initial momentum is lost during the first week, re-engaging unresponsive remote members becomes exceedingly difficult.
+    \item \textbf{Institutional and Academic Calendar Asymmetry:} Partner cohorts across Colombia and Canada operate under different semester timelines, add/drop windows, workload peaks, and grading weights. If students from one institution drop the course, change sections, or deprioritize an unaligned assignment before team formation stabilizes, the bilateral contract collapses before technical work even begins.
+    \item \textbf{Lack of an Automated Early-Escalation Clause:} The standard COIL workflow assumed bilateral participation would materialize organically, without specifying a strict 72-hour response Service Level Agreement (SLA) or an automatic instructor-mediated reassignment mechanism when a partner team goes silent.
+\end{enumerate}
+
+Ultimately, while the formal cross-institutional Group Contract could not be followed, the discipline of honoring its underlying technical and ethical standards led us to a stronger outcome. Within UniLlanos, Alejandro and I maintained clear accountability, met our technical milestones ahead of deadlines, and never lowered the engineering bar just because a partner was absent. In future international collaborations, I will insist on three safeguards from day one: a synchronous verification call in Week~1, explicit response-time SLAs with an instructor escalation trigger, and decoupled system interfaces so that a sub-team can always test and deliver reliably even when external dependencies fail.

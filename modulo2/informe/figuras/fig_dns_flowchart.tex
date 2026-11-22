@@ -1,0 +1,382 @@
+\begin{figure*}[htbp]
+\centering
+% Local semantic palette (self-contained for drop-in inclusion in any preamble)
+\definecolor{dnsNavy}{HTML}{1B365D}
+\definecolor{dnsNavyBg}{HTML}{EEF4FB}
+\definecolor{dnsBlue}{HTML}{1D4ED8}
+\definecolor{dnsBlueBg}{HTML}{EFF6FF}
+\definecolor{dnsTeal}{HTML}{0F766E}
+\definecolor{dnsTealBg}{HTML}{F0FDFA}
+\definecolor{dnsAmber}{HTML}{B45309}
+\definecolor{dnsAmberBg}{HTML}{FFFBEB}
+\definecolor{dnsRed}{HTML}{B91C1C}
+\definecolor{dnsRedBg}{HTML}{FEF2F2}
+\definecolor{dnsSlate}{HTML}{334155}
+\definecolor{dnsMuted}{HTML}{64748B}
+\definecolor{dnsPanelBg}{HTML}{F8FAFC}
+\definecolor{dnsBorder}{HTML}{CBD5E1}
+
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    font=\scriptsize,
+    node distance=0.55cm and 0.72cm,
+    % Base box styles
+    procbox/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=dnsNavy,
+        fill=dnsNavyBg,
+        line width=0.85pt,
+        text width=3.48cm,
+        align=center,
+        inner xsep=5pt,
+        inner ysep=5pt,
+        text=dnsSlate
+    },
+    parsebox/.style={
+        procbox,
+        draw=dnsSlate,
+        fill=dnsPanelBg
+    },
+    decision/.style={
+        diamond,
+        aspect=2.2,
+        draw=dnsBlue,
+        fill=dnsBlueBg,
+        line width=0.9pt,
+        text width=2.45cm,
+        align=center,
+        inner xsep=3pt,
+        inner ysep=3pt,
+        text=dnsNavy
+    },
+    outcard/.style={
+        rectangle,
+        rounded corners=4pt,
+        line width=0.9pt,
+        text width=5.15cm,
+        align=left,
+        inner xsep=6pt,
+        inner ysep=5pt,
+        text=dnsSlate
+    },
+    outteal/.style={outcard, draw=dnsTeal, fill=dnsTealBg},
+    outamber/.style={outcard, draw=dnsAmber, fill=dnsAmberBg},
+    outred/.style={outcard, draw=dnsRed, fill=dnsRedBg},
+    fwdbox/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=dnsBlue,
+        fill=dnsBlueBg,
+        line width=0.9pt,
+        text width=2.85cm,
+        align=left,
+        inner xsep=6pt,
+        inner ysep=5pt,
+        text=dnsSlate
+    },
+    relaybox/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=dnsBlue,
+        fill=dnsPanelBg,
+        line width=0.9pt,
+        text width=1.65cm,
+        align=center,
+        inner xsep=5pt,
+        inner ysep=5pt,
+        text=dnsSlate
+    },
+    dropbox/.style={
+        rectangle,
+        rounded corners=3pt,
+        draw=dnsRed,
+        dashed,
+        fill=dnsRedBg,
+        line width=0.75pt,
+        text width=2.95cm,
+        align=center,
+        inner xsep=4pt,
+        inner ysep=4pt,
+        text=dnsRed
+    },
+    egressbox/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=dnsNavy,
+        fill=dnsNavyBg,
+        line width=0.95pt,
+        text width=2.15cm,
+        align=center,
+        inner xsep=5pt,
+        inner ysep=6pt,
+        text=dnsNavy
+    },
+    % Connectors & badges
+    flow/.style={->, >=Stealth, line width=0.85pt, color=dnsNavy},
+    flowteal/.style={->, >=Stealth, line width=0.95pt, color=dnsTeal},
+    flowamber/.style={->, >=Stealth, line width=0.9pt, color=dnsAmber},
+    flowred/.style={->, >=Stealth, line width=0.9pt, color=dnsRed},
+    flowblue/.style={->, >=Stealth, line width=0.9pt, color=dnsBlue},
+    dropflow/.style={->, >=Stealth, dashed, line width=0.75pt, color=dnsRed},
+    yesbadge/.style={
+        rectangle,
+        rounded corners=2pt,
+        fill=white,
+        draw=dnsTeal,
+        line width=0.55pt,
+        inner xsep=3pt,
+        inner ysep=1.5pt,
+        font=\tiny\bfseries,
+        text=dnsTeal
+    },
+    nobadge/.style={
+        rectangle,
+        rounded corners=2pt,
+        fill=white,
+        draw=dnsSlate,
+        line width=0.55pt,
+        inner xsep=3pt,
+        inner ysep=1.5pt,
+        font=\tiny\bfseries,
+        text=dnsSlate
+    },
+    yesredbadge/.style={
+        yesbadge,
+        draw=dnsRed,
+        text=dnsRed
+    },
+    yesamberbadge/.style={
+        nobadge,
+        draw=dnsAmber,
+        text=dnsAmber
+    },
+    nobluebadge/.style={
+        nobadge,
+        draw=dnsBlue,
+        text=dnsBlue
+    },
+    zonebox/.style={
+        rectangle,
+        rounded corners=6pt,
+        draw=dnsBorder,
+        fill=white,
+        line width=0.85pt
+    },
+    zonehdr/.style={
+        font=\footnotesize\bfseries,
+        text=dnsNavy,
+        inner sep=1pt
+    },
+    paramcard/.style={
+        rectangle,
+        rounded corners=4pt,
+        draw=dnsBorder,
+        fill=dnsPanelBg,
+        line width=0.8pt,
+        align=left,
+        inner xsep=6pt,
+        inner ysep=5pt,
+        text=dnsSlate
+    }
+]
+
+% ==============================================================================
+% 1. TOP ZONE: PACKET-HANDLING DECISION PIPELINE (Right-to-Left by Construction)
+% ==============================================================================
+
+% Column 4: Four Resolution Lanes
+\node[outteal] (out_a) at (0,0) {
+    {\color{dnsTeal}\textbf{Authoritative \texttt{A} Record}} \hfill {\tiny\texttt{AA=1, NOERROR}}\\[2pt]
+    Answer: \texttt{172.22.201.2} $\cdot$ TTL = \qty{300}{\second}\\
+    Measured SD-WAN RTT: \textbf{\qty{0.53}{\milli\second}}
+};
+
+\node[outamber, below=0.38cm of out_a] (out_nodata) {
+    {\color{dnsAmber}\textbf{RFC 2308 \texttt{NODATA + SOA}}} \hfill {\tiny\texttt{NOERROR, 0 Ans}}\\[2pt]
+    Non-\texttt{A}/\texttt{ANY} (\texttt{AAAA} [28], \texttt{HTTPS} [65])\\
+    Prevents Android \texttt{netd} \texttt{FORMERR} via \texttt{SOA} (\qty{300}{\second})
+};
+
+\node[outred, below=0.52cm of out_nodata] (out_nx) {
+    {\color{dnsRed}\textbf{Authoritative \texttt{NXDOMAIN + SOA}}} \hfill {\tiny\texttt{RCODE=3}}\\[2pt]
+    Unknown \texttt{*.coil-group2.com} subdomain\\
+    Auth \texttt{SOA} negative cache (\texttt{TTL = \qty{300}{\second}})
+};
+
+\node[fwdbox, below=0.38cm of out_nx.south west, anchor=north west] (fwd_udp) {
+    {\color{dnsBlue}\textbf{Upstream Forwarder}}\\[2pt]
+    Raw UDP $\rightarrow$ \texttt{8.8.8.8:53}\\
+    Socket timeout: \qty{2.0}{\second}
+};
+
+\node[relaybox, anchor=east] (out_relay) at (out_a.east |- fwd_udp.east) {
+    {\color{dnsBlue}\textbf{Relay Reply}}\\[2pt]
+    Pass upstream\\response
+};
+
+\node[dropbox, below=0.38cm of fwd_udp, text width=2.85cm] (drop_timeout) {
+    Timeout / Error: Silent Drop
+};
+
+% Column 3: Secondary Decisions (Centered on Lane Pairs)
+\coordinate (mid_dec1a) at ($(out_a.west)!0.5!(out_nodata.west)$);
+\node[decision, anchor=east] (dec1a) at ($(mid_dec1a)+(-1.00cm,0)$) {
+    \texttt{qtype in}\\[1pt]\texttt{(A, ANY)}?
+};
+
+\coordinate (mid_dec2) at ($(out_nx.west)!0.5!(fwd_udp.west)$);
+\node[decision, anchor=east] (dec2) at ($(mid_dec2)+(-1.00cm,0)$) {
+    Subdomain of\\[1pt]\texttt{coil-group2.com}?
+};
+
+% Column 2: Primary Decision (Centered between Dec 1a and Dec 2)
+\coordinate (mid_dec1) at ($(dec1a.west)!0.5!(dec2.west)$);
+\node[decision, anchor=east] (dec1) at ($(mid_dec1)+(-1.00cm,0)$) {
+    \texttt{qname in}\\[1pt]\texttt{DOMAINS}?
+};
+
+% Column 1: Ingress, Parsing & Error Drop
+\node[parsebox, left=0.72cm of dec1.west] (parser) {
+    {\color{dnsNavy}\textbf{Parse \& Normalize}}\\[2pt]
+    \texttt{DNSRecord.parse(data)}\\
+    Lowercase \texttt{qname} (strip `\texttt{.}'), \texttt{qtype}
+};
+
+\node[procbox, above=0.55cm of parser] (ingress) {
+    {\color{dnsNavy}\textbf{UDP Ingress Socket}}\\[2pt]
+    Bind \texttt{0.0.0.0:53} (\texttt{recvfrom(4096)})\\
+    \texttt{SIO\_UDP\_CONNRESET=False}
+};
+
+\node[dropbox, below=0.55cm of parser] (drop_invalid) {
+    Invalid Packet: Silent Drop
+};
+
+% Column 5: Unified Client Egress Collector
+\coordinate (egress_rail_x) at ($(out_a.east)+(0.48cm,0)$);
+\coordinate (egress_top) at (egress_rail_x |- out_a.east);
+\coordinate (egress_mid) at ($(out_a.east)!0.5!(out_relay.east)$);
+\coordinate (egress_bot) at (egress_rail_x |- out_relay.east);
+\coordinate (egress_hub) at (egress_rail_x |- egress_mid);
+
+\node[egressbox, right=0.42cm of egress_hub] (egress) {
+    \textbf{Client Reply}\\[2pt]
+    \texttt{sendto(pkt, addr)}\\
+    SD-WAN Peer
+};
+
+% ==============================================================================
+% 2. ORTHOGONAL CONNECTORS & EDGE BADGES (Zero Absolute Coords, Zero Piercing)
+% ==============================================================================
+
+% Ingress -> Parser -> Dec1
+\draw[flow] (ingress.south) -- (parser.north);
+\draw[flow] (parser.east) -- (dec1.west);
+\draw[dropflow] (parser.south) -- node[right, font=\tiny, text=dnsRed, xshift=2pt] {Parse Error} (drop_invalid.north);
+
+% Dec1 -> Dec1a / Dec2
+\draw[flowteal] (dec1.north) |- (dec1a.west);
+\coordinate (b_dec1_yes) at ($(dec1.east |- dec1a.west)!0.5!(dec1a.west)$);
+\node[yesbadge] at (b_dec1_yes) {YES};
+
+\draw[flowblue] (dec1.south) |- (dec2.west);
+\coordinate (b_dec1_no) at ($(dec1.east |- dec2.west)!0.5!(dec2.west)$);
+\node[nobadge] at (b_dec1_no) {NO};
+
+% Dec1a -> Out A / Out NODATA
+\draw[flowteal] (dec1a.north) |- (out_a.west);
+\coordinate (b_dec1a_yes) at ($(dec1a.east |- out_a.west)!0.5!(out_a.west)$);
+\node[yesbadge] at (b_dec1a_yes) {YES};
+
+\draw[flowamber] (dec1a.south) |- (out_nodata.west);
+\coordinate (b_dec1a_no) at ($(dec1a.east |- out_nodata.west)!0.5!(out_nodata.west)$);
+\node[yesamberbadge] at (b_dec1a_no) {NO};
+
+% Dec2 -> Out NXDOMAIN / Forwarder
+\draw[flowred] (dec2.north) |- (out_nx.west);
+\coordinate (b_dec2_yes) at ($(dec2.east |- out_nx.west)!0.5!(out_nx.west)$);
+\node[yesredbadge] at (b_dec2_yes) {YES};
+
+\draw[flowblue] (dec2.south) |- (fwd_udp.west);
+\coordinate (b_dec2_no) at ($(dec2.east |- fwd_udp.west)!0.5!(fwd_udp.west)$);
+\node[nobluebadge] at (b_dec2_no) {NO};
+
+% Forwarder -> Relay & Timeout Drop
+\draw[flowblue] (fwd_udp.east) -- (out_relay.west);
+\draw[dropflow] (fwd_udp.south) -- node[right, font=\tiny, text=dnsRed, xshift=2pt] {\texttt{resp=None}} (drop_timeout.north);
+
+% Egress Collector Rail -> Client Reply
+\draw[line width=0.85pt, color=dnsNavy] (egress_top) -- (egress_bot);
+\draw[line width=0.85pt, color=dnsTeal] (out_a.east) -- (egress_rail_x |- out_a.east);
+\draw[line width=0.85pt, color=dnsAmber] (out_nodata.east) -- (egress_rail_x |- out_nodata.east);
+\draw[line width=0.85pt, color=dnsRed] (out_nx.east) -- (egress_rail_x |- out_nx.east);
+\draw[line width=0.85pt, color=dnsBlue] (out_relay.east) -- (egress_rail_x |- out_relay.east);
+\foreach \pt in {egress_top, egress_bot, egress_hub} {
+    \fill[dnsNavy] (\pt) circle (1.4pt);
+}
+\fill[dnsAmber] (egress_rail_x |- out_nodata.east) circle (1.4pt);
+\fill[dnsRed] (egress_rail_x |- out_nx.east) circle (1.4pt);
+\draw[flow] (egress_hub) -- (egress.west);
+
+% Pipeline Bounding Box & Section A Header
+\node[fit=(ingress)(parser)(drop_invalid)(dec1)(dec1a)(dec2)(out_a)(out_nodata)(out_nx)(fwd_udp)(drop_timeout)(out_relay)(egress), inner sep=0pt] (pipe_bbox) {};
+\node[zonehdr, anchor=south west] (hdr_a) at ($(pipe_bbox.north west)+(0,0.22cm)$) {
+    A. Authoritative \& Forwarding Packet-Handling Pipeline (\texttt{modulo2/dns/dns\_server.py} $\cdot$ \texttt{dnslib} Engine)
+};
+
+\begin{pgfonlayer}{bg}
+\node[zonebox, fit=(pipe_bbox)(hdr_a), inner sep=8pt] (zone_a) {};
+\end{pgfonlayer}
+
+% ==============================================================================
+% 3. BOTTOM ZONE: 3-COLUMN SYSTEM PARAMETERS & WINDOWS/ZEROTIER INTEGRATION
+% ==============================================================================
+
+\node[zonehdr, anchor=north west] (hdr_b) at ($(zone_a.south west)+(8pt,-0.40cm)$) {
+    B. Zone Table, RFC 2308 SOA Authority Parameters \& Windows / ZeroTier Host Integration
+};
+
+% Compute equal widths for 3 flush parameter cards spanning zone_a width (minus inner padding)
+\path let \p1 = (zone_a.west), \p2 = (zone_a.east),
+          \n1 = {(\x2 - \x1 - 16pt - 0.70cm)/3 - 12pt} in
+    node[paramcard, anchor=north west, text width=\n1, minimum height=2.35cm] (card_domains) at ($(hdr_b.south west)+(0,-0.16cm)$) {
+        {\color{dnsTeal}\textbf{1. Authoritative \texttt{DOMAINS} Map}}\\[2pt]
+        {\color{dnsBorder}\rule{\linewidth}{0.5pt}}\\[3pt]
+        \begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}r@{}}
+        \texttt{www.coil-group2.com} & \texttt{172.22.201.2} \\
+        \texttt{coil-group2.com} & \texttt{172.22.201.2} \\
+        \texttt{unillanos.coil-group2.com} & \texttt{172.22.201.2} \\
+        \texttt{seneca.coil-group2.com} & \texttt{172.22.201.2} \\
+        \end{tabular*}\\[4pt]
+        {\tiny\color{dnsMuted} Records: \texttt{QTYPE.A / ANY} $\cdot$ TTL: \qty{300}{\second} $\cdot$ \texttt{NOERROR}}
+    }
+    node[paramcard, anchor=north west, text width=\n1, minimum height=2.35cm] (card_soa) at ($(card_domains.north east)+(0.35cm,0)$) {
+        {\color{dnsAmber}\textbf{2. \texttt{SOA} Authority (\texttt{coil-group2.com})}}\\[2pt]
+        {\color{dnsBorder}\rule{\linewidth}{0.5pt}}\\[3pt]
+        \begin{tabular*}{\linewidth}{@{}l@{\extracolsep{\fill}}r@{}}
+        Primary NS (\texttt{MNAME}): & \texttt{ns.coil-group2.com} \\
+        Admin (\texttt{RNAME}): & \texttt{admin.coil-group2.com} \\
+        Serial / Min TTL: & \texttt{2026112101} / \qty{300}{\second} \\
+        Ref / Ret / Exp: & \qty{3600}{\second} / \qty{600}{\second} / \qty{86400}{\second} \\
+        \end{tabular*}\\[4pt]
+        {\tiny\color{dnsMuted} Returned in \texttt{auth} section (\qty{300}{\second}) for \texttt{NODATA}/\texttt{NXDOMAIN}}
+    }
+    node[paramcard, anchor=north west, text width=\n1, minimum height=2.35cm] (card_host) at ($(card_soa.north east)+(0.35cm,0)$) {
+        {\color{dnsNavy}\textbf{3. Windows \& ZeroTier SD-WAN Integration}}\\[2pt]
+        {\color{dnsBorder}\rule{\linewidth}{0.5pt}}\\[3pt]
+        \textbf{ICS Port Release:} Stop \texttt{SharedAccess} (frees UDP/53).\\[1.5pt]
+        \textbf{Firewall Rule:} Allow inbound \texttt{COIL\_DNS\_53} (UDP/53).\\[1.5pt]
+        \textbf{ZeroTier Push:} Net \texttt{abfd31bd47affa39} pushes domain \texttt{coil-group2.com} \& NS \texttt{172.22.201.2} (\texttt{hosts} fallback).
+    };
+
+\begin{pgfonlayer}{bg}
+\node[zonebox, fit=(hdr_b)(card_domains)(card_soa)(card_host), inner sep=8pt] (zone_b) {};
+\end{pgfonlayer}
+
+\end{tikzpicture}%
+}
+\caption{Packet-handling decision pipeline and authoritative zone configuration of the \texttt{dnslib}-based DNS daemon (\texttt{modulo2/dns/}\allowbreak\texttt{dns\_server.py}). Incoming UDP/53 datagrams are parsed, normalized, and routed across four deterministic branches: authoritative \texttt{A} resolution (\texttt{172.22.201.2}, TTL~=~\qty{300}{\second}, measured SD-WAN RTT~=~\qty{0.53}{\milli\second}), RFC~2308 \texttt{NODATA+SOA} responses preventing Android \texttt{netd} \texttt{FORMERR} faults on \texttt{AAAA}/\texttt{HTTPS} queries, \texttt{NXDOMAIN+SOA} negative caching for unregistered subdomains, and raw UDP forwarding to \texttt{8.8.8.8:53} (\qty{2.0}{\second} timeout) for external domains.}
+\label{fig:dns_flowchart}
+\end{figure*}

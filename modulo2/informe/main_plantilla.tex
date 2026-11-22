@@ -1,0 +1,158 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\graphicspath{{./imagenes/}{./Imágenes/}{../Imágenes/}{../imagenes/}}
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{babel, arrows.meta, positioning, shapes.geometric, decorations.pathreplacing, calc}
+
+% Configuración estética para presentar los filtros como código
+\lstset{
+    backgroundcolor=\color{black!5},
+    basicstyle=\ttfamily\small,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{black!40},
+    breaklines=true,
+    captionpos=b,
+    abovecaptionskip=8pt,
+    belowcaptionskip=10pt
+}
+
+\begin{document}
+
+\title{Inspección Analítica de Protocolos de Transporte: \\ Dinámica de Secuencias y Control de Flujo TCP}
+
+\author{
+    \IEEEauthorblockN{D. Castro y M. Rodríguez}
+    \IEEEauthorblockA{
+        \textit{Universidad de los Llanos} \\
+        \textit{Villavicencio, Colombia} \\
+        {\small \texttt{diomar.castro@unillanos.edu.co} \quad 161004708}\\
+        {\small \texttt{marodriguez.payares@unillanos.edu.co} \quad 161004834}
+    }
+}
+
+\maketitle
+
+\begin{abstract}
+El presente documento expone el escrutinio a bajo nivel de la pila de protocolos TCP/IP, focalizándose en los mecanismos matemáticos de fiabilidad y evasión de congestión. Mediante la intercepción de tráfico en un entorno de red real, se logró aislar algorítmicamente el proceso de sincronización inicial y la dinámica de la ventana de recepción durante una transferencia volumétrica de datos. Las disecciones de cabecera obtenidas validan la rigurosidad con la que el protocolo orquesta las transmisiones, garantizando la integridad de la carga útil sin saturar los recursos de la capa física. El análisis corrobora la robustez arquitectónica que mantiene la estabilidad de Internet.
+\end{abstract}
+
+\begin{IEEEkeywords}
+TCP, Wireshark, Handshake, Sequence Number, Control de Flujo, Deep Packet Inspection.
+\end{IEEEkeywords}
+
+\section{Introducción}
+Históricamente, la resiliencia de la red de área amplia (WAN) ha recaído sobre los hombros del Protocolo de Control de Transmisión (TCP). A diferencia de los modelos efímeros basados en datagramas que disparan información sin garantía de arribo, esta arquitectura de transporte impone un rigor transaccional absoluto antes de autorizar el libre tránsito de cualquier carga útil \cite{kozierok2005}.
+
+La consolidación de un canal fiable demanda la ejecución de un \textit{Three-Way Handshake}, un saludo trilateral que sincroniza los punteros lógicos de secuencia y calibra las capacidades de búfer de los nodos participantes. Una vez que este canal es declarado operativo, el algoritmo asume la responsabilidad de fragmentar, reensamblar y, sobre todo, regular la cadencia de la información para evitar el colapso de los enrutadores intermedios \cite{forouzan2013}.
+
+El propósito de este laboratorio radicó en extraer evidencias empíricas de dichos fenómenos teóricos. Apoyándonos en el motor de disección de Wireshark, capturamos una sesión de descarga real, aplicando álgebra booleana en los filtros de visualización para depurar el ruido metropolitano y exponer la anatomía exacta del diálogo entre un terminal local y un servidor remoto.
+
+\section{Marco Teórico}
+\subsection{El Algoritmo de Sincronización (3-Way Handshake)}
+La apertura formal de un socket TCP está supeditada al intercambio inicial de tres banderas de control (Flags). La estación solicitante despacha un segmento \textbf{SYN} dictando un número de secuencia aleatorio. El servidor receptor aprueba la moción devolviendo un paquete híbrido \textbf{SYN-ACK}, asimilando la secuencia del cliente (sumándole la unidad) y proponiendo la suya propia. Finalmente, el cliente expide un \textbf{ACK} puro, cerrando la negociación \cite{tanenbaum2021}. 
+
+Para ilustrar este comportamiento, se diseñó la \autoref{fig:tikz_teoria}, la cual expone no solo el cruce de banderas, sino el momento exacto en el que la capa de aplicación (HTTP) inyecta sus primeros datos.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[>=Latex, thick, node distance=2.5cm]
+        % Nodos principales
+        \node[draw, fill=blue!8, minimum width=2.2cm, minimum height=0.6cm, font=\small] (client) {Estación Local};
+        \node[draw, fill=red!8, minimum width=2.2cm, minimum height=0.6cm, right=3.5cm of client, font=\small] (server) {Servidor Remoto};
+        
+        % Eneas de tiempo
+        \draw[dashed, gray] (client.south) -- ++(0,-5) coordinate (c_end);
+        \draw[dashed, gray] (server.south) -- ++(0,-5) coordinate (s_end);
+
+        % SYN
+        \draw[->, blue!70!black] ([yshift=-0.8cm]client.south) -- node[above, sloped, font=\scriptsize] {\textbf{SYN} [Seq=0]} ([yshift=-1.6cm]server.south);
+        
+        % SYN-ACK
+        \draw[<-, red!70!black] ([yshift=-2.4cm]client.south) -- node[above, sloped, font=\scriptsize] {\textbf{SYN, ACK} [Seq=0, Ack=1]} ([yshift=-1.6cm]server.south);
+        
+        % ACK
+        \draw[->, blue!70!black] ([yshift=-3.2cm]client.south) -- node[above, sloped, font=\scriptsize] {\textbf{ACK} [Seq=1, Ack=1]} ([yshift=-4.0cm]server.south);
+        
+        % HTTP GET
+        \draw[->, black, very thick] ([yshift=-4.0cm]client.south) -- node[above, sloped, font=\scriptsize] {\textbf{HTTP GET} [Inyección de Carga Útil]} ([yshift=-4.8cm]server.south);
+        
+        % Ticks de estado
+        \node[left, font=\tiny, text=gray] at ([yshift=-0.8cm]client.south) {SYN-SENT};
+        \node[right, font=\tiny, text=gray] at ([yshift=-1.6cm]server.south) {SYN-RCVD};
+        \node[left, font=\tiny, text=gray] at ([yshift=-3.2cm]client.south) {ESTABLISHED};
+    \end{tikzpicture}
+    \caption{Diagrama arquitectónico del establecimiento de sesión empalmado con la primera transferencia de la capa de aplicación.}
+    \label{fig:tikz_teoria}
+\end{figure}
+
+\section{Metodología Empírica}
+Para el desarrollo de la recolección, se orquestó un escenario libre de encriptación que permitiera una lectura transparente de las tramas. 
+Se forzó una conexión mediante HTTP puro hacia el servidor de diagnóstico \texttt{speedtest.tele2.net}. Fue necesario ejecutar la petición desde una instancia limpia del navegador para evadir la política de optimización \textit{Keep-Alive}, obligando así a los nodos a negociar los números de secuencia (SEQ) desde cero y garantizando la presencia del saludo inicial en la traza \textit{.pcapng}. Posteriormente, se aplicaron operadores lógicos para desglosar la captura.
+
+\section{Resultados y Análisis Analítico}
+
+\subsection{Aislamiento del Flujo de Datos (Evidencia 1)}
+Las tarjetas de red modernas operan inmersas en un constante ruido de fondo generado por procesos en segundo plano. Presentar la totalidad de la captura restaría rigor al análisis. Por consiguiente, se procedió a rastrear el índice de la sesión correspondiente a nuestra descarga y se ejecutó un filtro estricto por flujo. La sintaxis inyectada en el analizador se detalla a continuación.
+
+\begin{figure}[htbp]
+\begin{lstlisting}[caption={Comando de abstracción para retener exclusivamente la sesión objetivo.}, label={lst:filtro1}]
+tcp.stream eq 50
+\end{lstlisting}
+\vspace{0.2cm}
+\centering
+\includegraphics[width=\columnwidth]{evidencia 1.png}
+\caption{Aislamiento de la conexión mediante el rastreo del identificador de flujo.}
+\label{fig:evidencia_1}
+\end{figure}
+
+El resultado, plasmado en la \autoref{fig:evidencia_1}, demuestra la limpieza absoluta de la pantalla. Al aplicar este parámetro, Wireshark descartó los paquetes espurios y concatenó lógicamente los datagramas, entregando un lienzo inmaculado para la métrica posterior.
+
+\subsection{Sincronización de Secuencias (Evidencia 2)}
+Para examinar la matemática del algoritmo de fiabilidad, resultaba imperativo ocultar la transferencia masiva y extraer los instantes fundacionales. Se anidó una condición booleana para atrapar únicamente las banderas de apertura y la petición hipertexto.
+
+\begin{figure}[htbp]
+\begin{lstlisting}[caption={Filtro lógico compuesto para extraer el Three-Way Handshake y la petición inicial.}, label={lst:filtro2}]
+tcp.stream eq 50 and (tcp.flags.syn == 1 or http.request.method == "GET")
+\end{lstlisting}
+\vspace{0.2cm}
+\centering
+\includegraphics[width=\columnwidth]{evidencia 2.png}
+\caption{Sincronización inicial de los parámetros SEQ y ACK en la apertura de la sesión.}
+\label{fig:evidencia_2}
+\end{figure}
+
+Al evaluar la imagen resultante de la \autoref{fig:evidencia_2}, el comportamiento empírico valida la teoría. El registro 900 evidencia a la máquina local arrancando con un \texttt{Seq=0}. Magistralmente, en el paquete 907, el servidor acusa de recibido sumándole un entero a dicho apuntador (\texttt{Ack=1}). Un instante después, el paquete 909 despacha la order \texttt{GET}; es aquí donde se inyecta la primera carga útil real de datos, forzando a la red a recalcular las secuencias subsecuentes basadas en la longitud de bytes.
+
+\subsection{Control de Congestión: Campo Window (Evidencia 3)}
+El último vértice de nuestro escrutinio recae sobre la gestión del tamaño de ventana. Con la finalidad de documentar la cabecera operando bajo estrés de transferencia, se diseñó un tercer filtro. Este parámetro eliminó de la visualización el historial residual y ancló en pantalla un único "vagón" pesado de datos (trama 913), cargado a tope con información.
+
+\begin{figure}[htbp]
+\begin{lstlisting}[caption={Directiva de filtrado restrictiva para aislar un segmento individual de alta carga.}, label={lst:filtro3}]
+tcp.stream eq 50 and tcp.len > 1000 and frame.number == 913
+\end{lstlisting}
+\vspace{0.2cm}
+\centering
+\includegraphics[width=\columnwidth]{evidencia 3.png}
+\caption{Inspección de la cabecera TCP detallando el parámetro de tamaño de ventana.}
+\label{fig:evidencia_3}
+\end{figure}
+
+Al someter esta trama a una inspección profunda (\textit{Deep Packet Inspection}) en el panel inferior, la \autoref{fig:evidencia_3} revela las entrañas de la arquitectura TCP. La disección expone el campo nominal \texttt{Window: 8}. No obstante, la verdadera matemática del protocolo se denota al multiplicar este parámetro base por el \textit{Scaling factor} de \texttt{16384} (negociado asimétricamente en el saludo inicial). El resultado final es una ventana calculada de \texttt{131072} bytes. Esta variable es la pieza de ingeniería crítica que le informa al transmisor el tope máximo de ráfaga permitida antes de incurrir en saturación de hardware.
+
+\section{Conclusiones}
+La disección algorítmica lograda a través de este laboratorio ratifica la precisión paramétrica del protocolo TCP. Lejos de ser un conducto ciego, el estándar operó bajo una rigurosa máquina de estados. 
+
+El diseño y aplicación de sintaxis de filtrado avanzada en Wireshark trascendió la simple visualización, convirtiéndose en una metodología matemática para abstraer eventos deterministas a partir del caos del tráfico metropolitano. La evidencia fotográfica obtenida correlaciona de manera exacta los cálculos de \textit{Sequence}, \textit{Acknowledgment} y escalado de ventana con los modelos teóricos, comprobando que la fiabilidad de las telecomunicaciones globales reposa sobre fundamentos lógicos estrictamente comprobables.
+
+\renewcommand{\refname}{Referencias}
+\bibliographystyle{IEEEtran}
+\bibliography{referencias_plantilla}
+\end{document}

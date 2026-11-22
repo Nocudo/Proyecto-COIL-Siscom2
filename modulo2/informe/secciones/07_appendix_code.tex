@@ -1,0 +1,116 @@
+\section{UniLlanos Cultural Intranet Source Code}
+\label{app:unillanos_html}
+Listing~\ref{lst:unillanos_html} reproduces the complete HTML5 and CSS3 implementation of the Universidad de los Llanos cultural intranet deployed at \texttt{https://www.coil-group2.com/unillanos/}.
+
+\lstinputlisting[
+  language=HTML,
+  caption={Complete source code of \texttt{modulo2/sitio\_web/unillanos/index.html}.},
+  label={lst:unillanos_html}
+]{../sitio_web/unillanos/index.html}
+
+\section{Seneca Polytechnic Intranet Source Code}
+\label{app:seneca_html}
+Listing~\ref{lst:seneca_html} presents the full institutional HTML5 and CSS3 source code for the Seneca Polytechnic partner intranet served at \texttt{https://www.coil-group2.com/seneca/}.
+
+\lstinputlisting[
+  language=HTML,
+  caption={Complete source code of \texttt{modulo2/sitio\_web/seneca/index.html}.},
+  label={lst:seneca_html}
+]{../sitio_web/seneca/index.html}
+
+\section{Dual Intranet Gateway Portal Source Code}
+\label{app:portal_html}
+Listing~\ref{lst:portal_html} documents the landing gateway page routing visitors to either institution from \texttt{https://www.coil-group2.com/}.
+
+\lstinputlisting[
+  language=HTML,
+  caption={Complete source code of \texttt{modulo2/sitio\_web/portal/index.html}.},
+  label={lst:portal_html}
+]{../sitio_web/portal/index.html}
+
+\section{Multi-Tenant HTTP/HTTPS Web Server}
+\label{app:server_https}
+Listing~\ref{lst:server_https} provides the production threaded dual-protocol HTTP/HTTPS server (\texttt{COIL-DualIntranet/2.0}) serving both intranets and distributing the Root CA bundle.
+
+\lstinputlisting[
+  language=Python,
+  caption={Complete source code of \texttt{modulo2/servidor/server\_https.py}.},
+  label={lst:server_https}
+]{../servidor/server_https.py}
+
+\section{Authoritative and Forwarding DNS Server}
+\label{app:dns_server}
+Listing~\ref{lst:dns_server} shows the RFC~1035 and RFC~2308 compliant \texttt{dnslib} daemon responsible for resolving COIL domains over UDP port 53 and forwarding external queries to \texttt{8.8.8.8}.
+
+\lstinputlisting[
+  language=Python,
+  caption={Complete source code of \texttt{modulo2/dns/dns\_server.py}.},
+  label={lst:dns_server}
+]{../dns/dns_server.py}
+
+\section{PKI and Client Deployment Automation Scripts}
+\label{app:pki_scripts}
+Listings~\ref{lst:openssl_cnf}, \ref{lst:install_ca_ps1}, and~\ref{lst:setup_hosts_ps1} contain the OpenSSL X.509v3 Subject Alternative Name configuration and automated PowerShell client provisioning scripts.
+
+\begin{lstlisting}[caption={OpenSSL PKI and SAN extension policy (\texttt{modulo2/certificados/openssl.cnf}).},label={lst:openssl_cnf}]
+[ req ]
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+prompt              = no
+
+[ req_distinguished_name ]
+C   = CO
+ST  = Meta
+L   = Villavicencio
+O   = COIL International Project
+OU  = SD-WAN Architecture Team
+CN  = COIL Group 2 Root CA
+
+[ v3_ca ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints       = critical, CA:true
+keyUsage               = critical, digitalSignature, cRLSign, keyCertSign
+
+[ server_req ]
+default_bits        = 2048
+distinguished_name  = server_distinguished_name
+prompt              = no
+
+[ server_distinguished_name ]
+C   = CO
+ST  = Meta
+L   = Villavicencio
+O   = Universidad de los Llanos & Seneca Polytechnic
+OU  = Sistemas de Comunicacion 2 - COIL
+CN  = www.coil-group2.com
+
+[ server_ext ]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid,issuer
+basicConstraints       = CA:FALSE
+keyUsage               = digitalSignature, keyEncipherment
+extendedKeyUsage       = serverAuth, clientAuth
+subjectAltName         = @alt_names
+
+[ alt_names ]
+DNS.1 = www.coil-group2.com
+DNS.2 = coil-group2.com
+DNS.3 = unillanos.coil-group2.com
+DNS.4 = seneca.coil-group2.com
+DNS.5 = localhost
+IP.1  = 172.22.201.2
+IP.2  = 172.22.31.69
+IP.3  = 10.51.76.174
+IP.4  = 127.0.0.1
+\end{lstlisting}
+
+\lstinputlisting[
+  caption={Automated Windows Root CA trust installation script (\texttt{modulo2/certificados/install\_root\_ca.ps1}).},
+  label={lst:install_ca_ps1}
+]{../certificados/install_root_ca.ps1}
+
+\lstinputlisting[
+  caption={Automated Windows local hosts fallback script (\texttt{modulo2/dns/setup\_hosts.ps1}).},
+  label={lst:setup_hosts_ps1}
+]{../dns/setup_hosts.ps1}

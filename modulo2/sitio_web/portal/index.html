@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COIL Group 2 - SD-WAN Intranet Gateway</title>
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131c2e;
+      --card-border: #22324e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-unillanos: #ea580c;
+      --accent-seneca: #dc2626;
+      --green-status: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .header {
+      padding: 2.5rem 2rem 1rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.9rem;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid var(--green-status);
+      color: var(--green-status);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.75rem;
+    }
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+    .gateways {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    @media (max-width: 640px) {
+      .header { padding: 1.5rem 1rem 0.5rem; }
+      h1 { font-size: 1.8rem; }
+      p.subtitle { font-size: 0.95rem; }
+      .container { padding: 0 1rem; margin: 1rem auto; }
+      .gateways { grid-template-columns: 1fr; gap: 1rem; }
+      .gateway-card { padding: 1.5rem 1.25rem; }
+      .network-bar { flex-direction: column; gap: 0.75rem; padding: 1rem; }
+    }
+    .gateway-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease-in-out;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+    .gateway-card.unillanos:hover {
+      border-color: var(--accent-unillanos);
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(234, 88, 12, 0.2);
+    }
+    .gateway-card.seneca:hover {
+      border-color: var(--accent-seneca);
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(220, 38, 38, 0.2);
+    }
+    .card-top {
+      margin-bottom: 2rem;
+    }
+    .card-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 1.5rem;
+    }
+    .unillanos .card-logo { background: var(--accent-unillanos); }
+    .seneca .card-logo { background: var(--accent-seneca); }
+    .gateway-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+    .gateway-card p.location {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .gateway-card p.desc {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .btn-enter {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.85rem 1.5rem;
+      border-radius: 8px;
+      color: white;
+      text-align: center;
+      justify-content: center;
+    }
+    .unillanos .btn-enter { background: var(--accent-unillanos); }
+    .seneca .btn-enter { background: var(--accent-seneca); }
+    .network-bar {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .network-item strong {
+      color: var(--text-main);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      border-top: 1px solid #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="badge">&bull; SD-WAN Infrastructure Online</div>
+    <h1>COIL Group 2 &bull; Dual Intranet Portal</h1>
+    <p class="subtitle">Bilateral Software-Defined WAN Interconnection between Seneca Polytechnic (Canada) and Universidad de los Llanos (Colombia).</p>
+  </header>
+
+  <main class="container">
+    <div class="gateways">
+      
+      <!-- UNILLANOS CARD -->
+      <a href="/unillanos/" class="gateway-card unillanos">
+        <div class="card-top">
+          <div class="card-logo">UL</div>
+          <h2>Universidad de los Llanos</h2>
+          <p class="location">Villavicencio, Meta &bull; Colombia</p>
+          <p class="desc">Discover the vibrant heritage of the Colombian Eastern Plains: Carne a la llanera (mamona), Torneo Internacional del Joropo, Jorop&oacute;dromo foot-stomping, Ca&ntilde;o Cristales, and our Electronic Engineering team profiles.</p>
+        </div>
+        <div class="btn-enter">Enter UniLlanos Intranet &rarr;</div>
+      </a>
+
+      <!-- SENECA CARD -->
+      <a href="/seneca/" class="gateway-card seneca">
+        <div class="card-top">
+          <div class="card-logo">SC</div>
+          <h2>Seneca Polytechnic</h2>
+          <p class="location">Toronto, Ontario &bull; Canada</p>
+          <p class="desc">Explore Canadian and Toronto culture: the iconic CN Tower skyline, outdoor winter ice hockey, authentic Quebec poutine, springtime maple syrup harvesting, and applied Information Technology programs.</p>
+        </div>
+        <div class="btn-enter">Enter Seneca Intranet &rarr;</div>
+      </a>
+
+    </div>
+
+    <div class="network-bar">
+      <div class="network-item">
+        SD-WAN Mesh: <strong>ZeroTier Virtual Ethernet</strong>
+      </div>
+      <div class="network-item">
+        Host IP: <strong>172.22.201.2</strong>
+      </div>
+      <div class="network-item">
+        Encryption: <strong>TLS 1.3 / HTTPS (Port 443)</strong>
+      </div>
+      <div class="network-item">
+        Domain: <strong>www.coil-group2.com</strong>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>COIL Academic Program &bull; Sistemas de Comunicaci&oacute;n 2 &bull; Fall 2026</p>
+    <p>Authors: Miguel &Aacute;ngel Rodr&iacute;guez Payares &amp; Luis Alejandro Le&oacute;n Vel&aacute;squez</p>
+  </footer>
+
+</body>
+</html>

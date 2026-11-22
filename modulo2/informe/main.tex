@@ -1,0 +1,118 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{siunitx}
+\sisetup{
+    output-decimal-marker = {.},
+    per-mode = symbol,
+    range-phrase = { to },
+    detect-all
+}
+
+\usepackage{graphicx}
+\graphicspath{{./}{./figuras/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.jpeg}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc, shapes.geometric, chains, bending, backgrounds}
+\pgfdeclarelayer{zonebg}
+\pgfdeclarelayer{cardbg}
+\pgfdeclarelayer{bg}
+\pgfsetlayers{background,zonebg,bg,cardbg,main}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{cite}
+\usepackage{xurl}
+\usepackage[colorlinks=true, linkcolor=blue!70!black, citecolor=blue!70!black, urlcolor=blue!70!black]{hyperref}
+
+\emergencystretch=3em
+\hbadness=10000
+\vbadness=10000
+\sloppy
+
+\lstdefinelanguage{HTML}{
+  morekeywords={html,head,meta,title,style,body,header,div,nav,a,main,section,h1,h2,h3,h4,p,span,img,footer,strong,em},
+  sensitive=false,
+  morecomment=[s]{<!--}{-->},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]'
+}
+
+\lstset{
+    backgroundcolor=\color{black!3},
+    basicstyle=\ttfamily\scriptsize,
+    keywordstyle=\color{blue!70!black}\bfseries,
+    commentstyle=\color{green!45!black}\itshape,
+    stringstyle=\color{orange!65!black},
+    frame=single,
+    framerule=0.4pt,
+    rulecolor=\color{black!35},
+    breaklines=true,
+    breakatwhitespace=false,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false,
+    numbers=none,
+    xleftmargin=0pt,
+    xrightmargin=0pt,
+    framexleftmargin=0pt,
+    framexrightmargin=0pt,
+    captionpos=b,
+    abovecaptionskip=6pt,
+    belowcaptionskip=8pt,
+    literate=
+      {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+      {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+      {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1
+      {°}{{\textdegree}}1 {–}{{-}}1 {—}{{--}}1 {→}{{->}}1 {←}{{<-}}1
+}
+
+\begin{document}
+
+\title{Design, Deployment, and Packet-Level Verification of a ZeroTier SD-WAN and Dual-Intranet HTTPS Infrastructure for International COIL Collaboration}
+
+\author{
+    \IEEEauthorblockN{Miguel \'{A}ngel Rodr\'{i}guez Payares and Luis Alejandro Le\'{o}n Vel\'{a}squez}
+    \IEEEauthorblockA{
+        \textit{Electronic Engineering Program, Faculty of Basic Sciences and Engineering} \\
+        \textit{Universidad de los Llanos (UniLlanos), Villavicencio, Meta, Colombia} \\
+        \textit{International COIL Module 2 Partner Collaboration with Seneca Polytechnic, Toronto, Canada} \\
+        {\small \texttt{marodriguez.payares@unillanos.edu.co} (ID: 161004834) \quad \texttt{laleon.velasquez@unillanos.edu.co}}
+    }
+}
+
+\maketitle
+
+\begin{abstract}
+This engineering report documents the complete design, deployment, live telemetry acquisition, and packet-level verification of a Software-Defined Wide Area Network (SD-WAN) and dual-tenant HTTPS cultural intranet infrastructure developed for Module 2 of the Collaborative Online International Learning (COIL) partnership between Universidad de los Llanos (Villavicencio, Colombia) and Seneca Polytechnic (Toronto, Canada). Five authorized endpoints (desktop hosts and mobile Android devices) were interconnected across a private ZeroTier overlay subnetwork (\texttt{abfd31bd47affa39}, \texttt{172.22.0.0/16}, interface MTU \qty{1300}{\byte}). A custom threaded Python web server (\texttt{COIL-DualIntranet/2.0}) delivers responsive institutional intranets secured with TLS~1.3 (\texttt{TLS\_AES\_256\_GCM\_SHA384}) using a private 2048-bit RSA Root Certificate Authority (\texttt{COIL Group 2 Root CA}) with Subject Alternative Name (SAN) leaf certificates trusted natively by Windows and Android clients for zero-warning browser verification. Domain-based routing (\texttt{www.coil-group2.com}) is served by a \texttt{dnslib}-based authoritative UDP/53 DNS daemon implementing RFC~2308 negative caching (\texttt{NODATA+SOA}). Live Wireshark dissection (\qty{24.81}{\kilo\byte} capture, strictly below the \qty{10}{\mega\byte} limit) validates sub-millisecond (\qty{0.53}{\milli\second}) SD-WAN DNS resolution, MSS~\qty{1260}{\byte} TCP three-way handshakes, 1-RTT TLS~1.3 encrypted delivery of the \qty{15470}{\byte} partner intranet payload, and graceful four-way FIN teardowns with zero resets.
+\end{abstract}
+
+\begin{IEEEkeywords}
+SD-WAN, ZeroTier, TLS~1.3, Public Key Infrastructure, Authoritative DNS, Wireshark, Deep Packet Inspection, COIL.
+\end{IEEEkeywords}
+
+\input{secciones/01_zerotier_sdwan}
+\input{secciones/02_demo_videos}
+\input{secciones/03_wireshark_analysis}
+\input{secciones/04_manuals_sdwan_web}
+\input{secciones/05_manuals_pki_dns}
+\input{secciones/06_discussion_conclusions}
+
+\renewcommand{\refname}{References}
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+
+\clearpage
+\onecolumn
+\appendices
+\input{secciones/07_appendix_code}
+
+\end{document}

@@ -1,0 +1,81 @@
+\section{Part 1: Critical Incident Analysis (5\%)}
+
+This section addresses Part~1 of Module~3 using both rubric formats on the exact same Group~2 factual narrative: a 300-word written summary (Option~A) and a synchronized one-minute oral presentation script (Option~B).
+
+\subsection{Option A: Written Critical Incident Summary (300 Words)}
+
+\begin{tcolorbox}[
+    enhanced,
+    breakable,
+    colback=LightPanel,
+    colframe=NavyPrimary,
+    boxrule=0.8pt,
+    arc=4pt,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt,
+    title={\textbf{Critical Incident Written Analysis --- Miguel \'Angel Rodr\'iguez Payares}},
+    fonttitle=\small\bfseries,
+    coltitle=white,
+    colbacktitle=NavyPrimary
+]
+During our COIL Group~2 collaboration between Universidad de los Llanos in Colombia and Seneca Polytechnic in Canada, the primary critical incident emerged at the very outset of the project. Although the technical assignment required an interconnected Software-Defined Wide Area Network linking servers and student clients across both institutions, we experienced a complete absence of contact from our assigned Seneca Polytechnic counterparts from the beginning of the exchange. Neither initial outreach messages nor coordination attempts through the shared course channels produced a reply, leaving our bilateral team without active Canadian participation.
+
+This communication breakdown created a severe operational obstacle. According to the Module~2 guidelines, Seneca students were responsible for configuring the authoritative DNS server inside the overlay network and deploying their institutional cultural intranet, while both universities were expected to negotiate and sign a Group Contract. Without partner engagement, our UniLlanos sub-team faced the risk of being unable to validate cross-institutional domain resolution, end-to-end TLS encryption, or live Wireshark traffic capture.
+
+To prevent project failure, my UniLlanos teammate, Luis Alejandro Le\'on Vel\'asquez, and I documented the lack of response and established an internal contingency plan. I assumed end-to-end architecture for the ZeroTier SD-WAN overlay, the RFC-compliant authoritative DNS service, our private Root Certificate Authority, the dual-protocol HTTPS server, and a secondary gateway node simulating the Seneca endpoint. I also researched Canadian landmarks, traditions, and gastronomy to build the Seneca cultural intranet respectfully, while Alejandro administered the ZeroTier Central network and verified domain navigation from an external physical client node across the Americas.
+
+This experience taught me that international engineering projects often fail not over code or protocols, but due to early coordination gaps and academic calendar mismatches. Proactive contingency planning, clear documentation, and willingness to absorb critical dependencies transformed an initial deadlock into a fully verified, cross-cultural technical delivery.
+\end{tcolorbox}
+
+\noindent\textit{Verified length: 300~words across four cohesive paragraphs covering context, impact, technical resolution, and intercultural reflection.}
+
+\subsection{Option B: One-Minute Video Presentation Script}
+
+The following monologue condenses the critical incident narrative into a clear 60-second delivery format (146~spoken words at a natural speaking cadence of 145--150~words per minute). Table~\ref{tab:video_script_timing} provides scene timing cues for recording or voiceover synchronization, followed by the continuous script block.
+
+\begin{table}[H]
+\centering
+\caption{Timed Delivery Breakdown for the One-Minute Critical Incident Video (Option~B).}
+\label{tab:video_script_timing}
+\small
+\begin{tabularx}{\textwidth}{@{} >{\bfseries}l >{\bfseries}l >{\raggedright\arraybackslash}X @{}}
+\toprule
+\textbf{Time Window} & \textbf{Rubric Beat} & \textbf{Visual / Screen Cue} \\
+\midrule
+0:00 -- 0:14 & Context & Title card or webcam introduction showing COIL Group~2 header and UniLlanos affiliation. \\
+0:14 -- 0:28 & Challenge \& Impact & Brief view of Module~2 topology highlighting Seneca's planned DNS and intranet dependencies. \\
+0:28 -- 0:47 & Technical Resolution & Show ZeroTier Central (\texttt{abfd31bd47affa39}), dual HTTPS portal, and \texttt{https://www.coil-group2.com/seneca/}. \\
+0:47 -- 1:00 & Lesson Learned & Closing slide or direct camera view summarizing proactive ownership and cross-cultural learning. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{tcolorbox}[
+    enhanced,
+    colback=TealBg,
+    colframe=TealAccent,
+    boxrule=0.8pt,
+    arc=4pt,
+    left=10pt,
+    right=10pt,
+    top=8pt,
+    bottom=8pt,
+    title={\textbf{Continuous Oral Script (146 Spoken Words --- Approx. 60 Seconds)}},
+    fonttitle=\small\bfseries,
+    coltitle=white,
+    colbacktitle=TealAccent
+]
+``Hello everyone, my name is Miguel \'Angel Rodr\'iguez Payares, a tenth-semester Electronic Engineering student at Universidad de los Llanos. During our Group~2 COIL exchange with Seneca Polytechnic, we faced a critical incident right from the start: complete silence from our assigned Canadian partners.
+
+Because Seneca was originally expected to host the DNS service and their cultural intranet, and both sides needed to sign a Group Contract, this lack of communication threatened our ability to demonstrate domain-based HTTPS connectivity.
+
+Instead of stalling, my teammate Luis Alejandro Le\'on and I agreed on a contingency plan. I deployed the ZeroTier SD-WAN, the authoritative DNS server, a custom Root CA, both cultural intranets, and a simulated Seneca gateway, while Alejandro managed ZeroTier Central and external client verification.
+
+This taught me that resilient engineering depends on early verification, clear documentation, and proactive ownership whenever international coordination breaks down. Thank you.''
+\end{tcolorbox}
+
+Figure~\ref{fig:contingency_workflow} summarizes how this critical incident shifted the project from an initial bilateral deadlock to a validated full-stack implementation.
+
+\input{figuras/fig_contingency_workflow.tex}

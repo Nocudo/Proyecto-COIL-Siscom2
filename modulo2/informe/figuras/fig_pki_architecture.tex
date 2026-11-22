@@ -1,0 +1,324 @@
+\begin{figure*}[htbp]
+\centering
+\definecolor{pkiGoldFill}{HTML}{FEF3C7}
+\definecolor{pkiGoldLine}{HTML}{B45309}
+\definecolor{pkiGoldBg}{HTML}{FFFBEB}
+\definecolor{pkiBlueFill}{HTML}{DBEAFE}
+\definecolor{pkiBlueLine}{HTML}{1D4ED8}
+\definecolor{pkiBlueBg}{HTML}{EFF6FF}
+\definecolor{pkiIndigoFill}{HTML}{E0E7FF}
+\definecolor{pkiIndigoLine}{HTML}{3730A3}
+\definecolor{pkiPurpleFill}{HTML}{EDE9FE}
+\definecolor{pkiPurpleLine}{HTML}{6D28D9}
+\definecolor{pkiPurpleBg}{HTML}{F5F3FF}
+\definecolor{pkiGreenFill}{HTML}{D1FAE5}
+\definecolor{pkiGreenLine}{HTML}{047857}
+\definecolor{pkiGreenBg}{HTML}{ECFDF5}
+\definecolor{pkiRedFill}{HTML}{FEE2E2}
+\definecolor{pkiRedLine}{HTML}{B91C1C}
+\definecolor{pkiSlateFill}{HTML}{F1F5F9}
+\definecolor{pkiSlateLine}{HTML}{475569}
+
+\resizebox{0.96\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    every node/.style={font=\scriptsize, text=black!88},
+    node distance=0.45cm and 0.55cm,
+    card/.style={
+        rectangle, rounded corners=3pt, draw=pkiSlateLine, fill=white,
+        line width=0.75pt, inner sep=5.5pt, align=left
+    },
+    card_gold/.style={card, draw=pkiGoldLine, fill=white},
+    card_blue/.style={card, draw=pkiBlueLine, fill=white},
+    card_indigo/.style={card, draw=pkiIndigoLine, fill=pkiIndigoFill!35},
+    card_purple/.style={card, draw=pkiPurpleLine, fill=white},
+    card_green/.style={card, draw=pkiGreenLine, fill=white},
+    card_err/.style={card, draw=pkiRedLine, fill=pkiRedFill!75, align=center},
+    card_ok/.style={card, draw=pkiGreenLine, fill=pkiGreenFill!85, align=center},
+    hdr_pill/.style={
+        rectangle, rounded corners=2pt, font=\scriptsize\bfseries,
+        inner xsep=6pt, inner ysep=2.5pt, text=white
+    },
+    zone_box/.style={
+        rectangle, rounded corners=6pt, dashed, line width=0.85pt, inner sep=8pt
+    },
+    flow_arr/.style={
+        -{Stealth[length=5pt, width=3.5pt]},
+        line width=0.95pt, color=pkiSlateLine, shorten >=1.5pt, shorten <=1pt
+    },
+    flow_short/.style={
+        -{Stealth[length=4pt, width=2.8pt]},
+        line width=0.85pt, color=pkiSlateLine, shorten >=1pt, shorten <=0.5pt
+    },
+    rail_gold/.style={
+        -{Stealth[length=5pt, width=3.5pt]},
+        line width=0.95pt, color=pkiGoldLine, rounded corners=4pt, shorten >=1.5pt
+    },
+    verify_arr/.style={
+        {Stealth[length=4.5pt, width=3pt]}-{Stealth[length=4.5pt, width=3pt]},
+        line width=0.95pt, densely dashed, color=pkiGreenLine, shorten >=1.5pt, shorten <=1.5pt
+    },
+    edge_tag/.style={
+        font=\tiny\bfseries, fill=white, inner xsep=3.5pt, inner ysep=1.5pt,
+        rounded corners=1.5pt, draw=black!20, line width=0.35pt, align=center
+    },
+]
+
+\node[card_gold, text width=6.6cm, minimum height=2.15cm] (ca_id) at (0,0) {%
+    \textbf{\footnotesize COIL Group 2 Root CA}\\[2pt]
+    {\tiny\color{pkiGoldLine}\textbf{Self-Signed Root Authority (Offline)}}\\[3pt]
+    $\bullet$ \textbf{Subject/Issuer:} \texttt{CN = COIL Group 2 Root CA}\\
+    $\bullet$ \textbf{Cert:} \texttt{COIL\_Group2\_Root\_CA.crt} / \texttt{ca-cert.pem}\\
+    $\bullet$ \textbf{Signing Key:} \texttt{ca-key.pem} (offline private key)
+};
+
+\node[card_gold, text width=7.1cm, minimum height=2.15cm, right=0.55cm of ca_id] (ca_specs) {%
+    \textbf{Cryptographic Profile \& X.509v3 Constraints}\\[3pt]
+    $\bullet$ \textbf{Key / Hash:} \texttt{2048-bit RSA}, SHA-256 self-signed\\
+    $\bullet$ \textbf{Extensions:} \texttt{CA:TRUE}, \texttt{keyCertSign}, \texttt{cRLSign}\\
+    $\bullet$ \textbf{Serial:} \texttt{1CB6...57D0}\\
+    $\bullet$ \textbf{Validity:} Nov 21, 2026 -- Nov 18, 2036 (\qty{3650}{days})
+};
+
+\coordinate (t1_mid_top) at ($(ca_id.north west)!0.5!(ca_specs.north east)$);
+\coordinate (t1_mid_bot) at ($(ca_id.south west)!0.5!(ca_specs.south east)$);
+
+\node[hdr_pill, fill=pkiGoldLine, anchor=south west] (t1_hdr)
+    at ($(ca_id.north west)+(0,0.18cm)$)
+    {TIER 1: Offline Root Authority};
+
+\begin{pgfonlayer}{background}
+    \node[zone_box, draw=pkiGoldLine, fill=pkiGoldBg, fit=(t1_hdr)(ca_id)(ca_specs)] (zone_t1) {};
+\end{pgfonlayer}
+
+\node[rectangle, rounded corners=3pt, fill=pkiSlateFill, draw=pkiSlateLine!45,
+      line width=0.6pt, inner xsep=12pt, inner ysep=4pt,
+      font=\small\bfseries, text=black!90, anchor=south] (fig_title)
+    at ($(zone_t1.north -| t1_mid_top)+(0,0.42cm)$)
+    {COIL Group 2 -- Custom Root CA PKI, X.509v3 SANs, TLS 1.3 Stack \& Trust Remediation};
+
+\coordinate (t2_row_top) at ($(zone_t1.south -| t1_mid_bot)+(0,-1.65cm)$);
+
+\node[card_blue, text width=4.45cm, minimum height=3.20cm, anchor=north] (leaf_crt)
+    at (t2_row_top) {%
+    \textbf{Leaf Certificate (\texttt{server.crt})}\\[2pt]
+    \textbf{Subject:} \texttt{CN = www.coil-group2.com}\\[3pt]
+    $\bullet$ \textbf{Constraints:} \texttt{CA:FALSE}\\
+    $\bullet$ \textbf{Key Usage:} \texttt{digitalSignature},\\
+    \hspace*{1.2em}\texttt{keyEncipherment}\\
+    $\bullet$ \textbf{EKU:} \texttt{serverAuth}, \texttt{clientAuth}\\
+    $\bullet$ \textbf{Serial:} \texttt{173D...87D7}\\
+    $\bullet$ \textbf{Valid:} Nov 21, 2026 -- Feb 23, 2029\\
+    \hspace*{1.2em}(\qty{825}{days})
+};
+
+\node[card_blue, text width=3.05cm, minimum height=1.42cm, anchor=north east] (t2_cnf)
+    at ($(leaf_crt.north west)+(-0.65cm,0)$) {%
+    \textbf{OpenSSL Policy}\\[2pt]
+    \texttt{openssl.cnf}\\
+    {\tiny Profiles: \texttt{[v3\_ca]} \& \texttt{[server\_ext]}}
+};
+
+\node[card_blue, text width=3.05cm, minimum height=1.42cm, anchor=south east] (t2_csr)
+    at (leaf_crt.south west -| t2_cnf.east) {%
+    \textbf{Signing Request}\\[2pt]
+    \texttt{server.csr}\\
+    {\tiny Signed by \texttt{ca-key.pem}}
+};
+
+\node[card_indigo, text width=4.05cm, minimum height=3.20cm, anchor=north west] (san_box)
+    at ($(leaf_crt.north east)+(0.95cm,0)$) {%
+    \textbf{X.509v3 SAN Extension}\\[1pt]
+    {\tiny\color{pkiIndigoLine}\textbf{Subject Alternative Name (\texttt{[alt\_names]})}}\\[3pt]
+    \textbf{DNS Entries (5):}\\
+    {\tiny\texttt{www.coil-group2.com}\\[0.5pt]
+    \texttt{coil-group2.com}\\[0.5pt]
+    \texttt{unillanos.coil-group2.com}\\[0.5pt]
+    \texttt{seneca.coil-group2.com}\\[0.5pt]
+    \texttt{localhost}}\\[3pt]
+    \textbf{IP Entries (4):}\\
+    {\tiny\texttt{172.22.201.2}, \texttt{172.22.31.69},\\[0.5pt]
+    \texttt{10.51.76.174}, \texttt{127.0.0.1}}
+};
+
+\node[hdr_pill, fill=pkiBlueLine, anchor=south west] (t2_hdr)
+    at ($(t2_cnf.north west)+(0,0.18cm)$)
+    {TIER 2: OpenSSL \& Leaf CA};
+
+\begin{pgfonlayer}{background}
+    \node[zone_box, draw=pkiBlueLine, fill=pkiBlueBg, fit=(t2_hdr)(t2_cnf)(t2_csr)(leaf_crt)(san_box)] (zone_t2) {};
+\end{pgfonlayer}
+
+\def\coloffset{4.90cm}
+\coordinate (t3_top_y) at ($(zone_t2.south -| t1_mid_bot)+(0,-1.75cm)$);
+\coordinate (t3A_center_top) at ($(t3_top_y)+(-\coloffset,0)$);
+\coordinate (t3B_center_top) at ($(t3_top_y)+(+\coloffset,0)$);
+
+\node[card_purple, text width=6.95cm, minimum height=1.05cm, anchor=north] (pA_bundle) at (t3A_center_top) {%
+    \textbf{TLS Certificate Chain \& Private Key Bundle}\\[2pt]
+    \texttt{fullchain.pem} (\texttt{server.crt} + \texttt{ca-cert.pem}) + \texttt{server-key.pem}
+};
+
+\node[card_purple, text width=6.95cm, minimum height=1.28cm, below=0.45cm of pA_bundle] (pA_ctx) {%
+    \textbf{Python HTTPS Server Context}\\[2pt]
+    \texttt{ssl.SSLContext(PROTOCOL\_TLS\_SERVER)}\\
+    ALPN: \texttt{http/1.1} \quad$\cdot$\quad Cipher: \texttt{TLS\_AES\_256\_GCM\_SHA384}
+};
+
+\coordinate (row3_top_y) at ($(pA_ctx.south)+(0,-0.55cm)$);
+
+\node[card_purple, text width=3.20cm, minimum height=1.18cm, align=center, anchor=north west] (pA_uni)
+    at (pA_ctx.west |- row3_top_y) {%
+    \textbf{UniLlanos Server}\\
+    \texttt{172.22.201.2:443}
+};
+
+\node[card_purple, text width=3.20cm, minimum height=1.18cm, align=center, anchor=north east] (pA_sen)
+    at (pA_ctx.east |- row3_top_y) {%
+    \textbf{Seneca Gateway}\\
+    \texttt{172.22.31.69:443}
+};
+
+\node[hdr_pill, fill=pkiPurpleLine, anchor=south west] (pA_hdr)
+    at ($(pA_bundle.north west)+(0,0.18cm)$)
+    {TIER 3A: Server TLS 1.3 Stack};
+
+\begin{pgfonlayer}{background}
+    \node[zone_box, draw=pkiPurpleLine, fill=pkiPurpleBg, fit=(pA_hdr)(pA_bundle)(pA_ctx)(pA_uni)(pA_sen)] (zone_3A) {};
+\end{pgfonlayer}
+
+\node[card_green, text width=6.95cm, minimum height=1.05cm, anchor=north] (pB_dist) at (t3B_center_top) {%
+    \textbf{Root CA Distribution Mechanism}\\[2pt]
+    \texttt{COIL\_Group2\_Root\_CA.crt} (served via \texttt{/ca.crt} or \texttt{install\_root\_ca.ps1})
+};
+
+\node[card_green, text width=3.85cm, minimum height=1.28cm, anchor=north west] (pB_win)
+    at ($(pB_dist.south west)+(0,-0.45cm)$) {%
+    \textbf{Windows Trust Store}\\
+    \texttt{Cert:\textbackslash LocalMachine\textbackslash Root}\\
+    {\tiny Thumbprint: \texttt{6C94...E0D9}}
+};
+
+\node[card_green, text width=2.55cm, minimum height=1.28cm, anchor=north east] (pB_and)
+    at ($(pB_dist.south east)+(0,-0.45cm)$) {%
+    \textbf{Android OS}\\
+    Android Trusted\\
+    Credentials
+};
+
+\node[card_err, text width=3.22cm, minimum height=1.18cm, anchor=north west] (pB_err)
+    at (pB_dist.west |- row3_top_y) {%
+    \textbf{Eliminates Warning}\\[2pt]
+    {\fontsize{4.6}{6}\selectfont\texttt{NET::ERR\_CERT\_AUTHORITY\_INVALID}}
+};
+
+\node[card_ok, text width=2.45cm, minimum height=1.18cm, anchor=north east] (pB_ok)
+    at (pB_dist.east |- row3_top_y) {%
+    \textbf{Verified Trusted}\\
+    \textbf{HTTPS Padlock}\\
+    {\tiny Chrome \& Mobile}
+};
+
+\node[hdr_pill, fill=pkiGreenLine, anchor=south west] (pB_hdr)
+    at ($(pB_dist.north west)+(0,0.18cm)$)
+    {TIER 3B: Client Trust Store (Bonus)};
+
+\begin{pgfonlayer}{background}
+    \node[zone_box, draw=pkiGreenLine, fill=pkiGreenBg, fit=(pB_hdr)(pB_dist)(pB_win)(pB_and)(pB_err)(pB_ok)] (zone_3B) {};
+\end{pgfonlayer}
+
+\coordinate (t1_sign_exit) at (zone_t1.south -| leaf_crt.north);
+\draw[flow_arr] (t1_sign_exit) -- (leaf_crt.north);
+\node[edge_tag] at ($(t1_sign_exit)!0.50!(t1_sign_exit |- zone_t2.north)$)
+    {Signs CSR w/ \texttt{ca-key.pem}};
+
+\coordinate (t2_join) at ($(leaf_crt.west)+(-0.32cm,0)$);
+\draw[line width=0.85pt, color=pkiSlateLine] (t2_cnf.east) -| (t2_join);
+\draw[line width=0.85pt, color=pkiSlateLine] (t2_csr.east) -| (t2_join);
+\draw[flow_short] (t2_join) -- (leaf_crt.west);
+
+\draw[flow_short] (leaf_crt.east) -- node[edge_tag, above=4pt] {Embeds} (leaf_crt.east -| san_box.west);
+
+\coordinate (pA_crt_in) at ($(pA_bundle.north east)+(-0.95cm,0)$);
+\coordinate (bus_t2_t3) at ($(zone_t2.south)!0.50!(zone_3A.north)$);
+\draw[flow_arr, rounded corners=4pt]
+    (leaf_crt.south) -- (leaf_crt.south |- bus_t2_t3)
+    -| (pA_crt_in);
+\node[edge_tag] at ($(leaf_crt.south |- bus_t2_t3)!0.48!(pA_crt_in |- bus_t2_t3)$)
+    {\texttt{server.crt} (Leaf)};
+
+\coordinate (rail_L_x) at ($(zone_3A.west)+(-0.62cm,0)$);
+\draw[rail_gold]
+    (zone_t1.west) -- (zone_t1.west -| rail_L_x)
+    |- (pA_bundle.west);
+\node[edge_tag, text=pkiGoldLine, draw=pkiGoldLine!60, anchor=center]
+    at (rail_L_x |- leaf_crt.center)
+    {\texttt{ca-cert.pem}\\[1pt](Chain Anchor)};
+
+\coordinate (rail_R_x) at ($(zone_3B.east)+(0.62cm,0)$);
+\draw[rail_gold]
+    (zone_t1.east) -- (zone_t1.east -| rail_R_x)
+    |- (pB_dist.east);
+\node[edge_tag, text=pkiGoldLine, draw=pkiGoldLine!60, anchor=center]
+    at (rail_R_x |- san_box.center)
+    {\texttt{COIL\_Group2\_}\\[1pt]\texttt{Root\_CA.crt}\\[1pt](Trust Anchor)};
+
+\draw[flow_short] (pA_bundle.south) -- (pA_ctx.north);
+\coordinate (pA_split) at ($(pA_ctx.south)!0.45!(pA_uni.north -| pA_ctx.south)$);
+\draw[line width=0.85pt, color=pkiSlateLine] (pA_ctx.south) -- (pA_split);
+\draw[flow_short, rounded corners=3pt] (pA_split) -| (pA_uni.north);
+\draw[flow_short, rounded corners=3pt] (pA_split) -| (pA_sen.north);
+
+\coordinate (pB_split) at ($(pB_dist.south)!0.45!(pB_win.north -| pB_dist.south)$);
+\draw[line width=0.85pt, color=pkiSlateLine] (pB_dist.south) -- (pB_split);
+\draw[flow_short, rounded corners=3pt] (pB_split) -| (pB_win.north);
+\draw[flow_short, rounded corners=3pt] (pB_split) -| (pB_and.north);
+
+\draw[flow_short] (pB_win.south) -- (pB_win.south |- pB_err.north);
+\draw[flow_short] (pB_and.south) -- (pB_and.south |- pB_ok.north);
+\draw[flow_short, color=pkiGreenLine] (pB_err.east) -- (pB_ok.west);
+
+\draw[verify_arr] (pA_sen.east) -- (pB_err.west);
+\node[edge_tag, text=pkiGreenLine, draw=pkiGreenLine!60, anchor=south]
+    at ($(pA_sen.east)!0.5!(pB_err.west)+(0,0.14cm)$)
+    {TLS 1.3 +\\[1pt]SAN Match};
+
+\coordinate (bot_mid) at ($(zone_3A.south west)!0.5!(zone_3B.south east)+(0,-0.45cm)$);
+
+\node[font=\scriptsize\bfseries, anchor=north] (leg_hdr) at (bot_mid)
+    {Architecture Legend \& Cryptographic Flow Semantics};
+
+\node[font=\tiny, anchor=north, align=center] (leg_r1) at ($(leg_hdr.south)+(0,-0.12cm)$) {%
+    \fcolorbox{pkiGoldLine}{pkiGoldBg}{\rule{0pt}{4.2pt}\rule{6.5pt}{0pt}}\, Tier 1: Offline Root CA \qquad
+    \fcolorbox{pkiBlueLine}{pkiBlueBg}{\rule{0pt}{4.2pt}\rule{6.5pt}{0pt}}\, Tier 2: OpenSSL Policy \& SAN Leaf \qquad
+    \fcolorbox{pkiPurpleLine}{pkiPurpleBg}{\rule{0pt}{4.2pt}\rule{6.5pt}{0pt}}\, Tier 3A: Server TLS 1.3 Stack \qquad
+    \fcolorbox{pkiGreenLine}{pkiGreenBg}{\rule{0pt}{4.2pt}\rule{6.5pt}{0pt}}\, Tier 3B: Client Trust Store (Bonus)
+};
+
+\coordinate (leg_r2_y) at ($(leg_r1.south)+(0,-0.32cm)$);
+
+\node[font=\tiny, anchor=west] (ar2_txt) at ($(leg_r2_y)+(-0.95cm,0)$) {Root CA Distribution Rail};
+\draw[rail_gold] ($(ar2_txt.west)+(-0.72cm,0)$) -- ($(ar2_txt.west)+(-0.06cm,0)$);
+\coordinate (ar2_start) at ($(ar2_txt.west)+(-0.75cm,0)$);
+
+\node[font=\tiny, anchor=east] (ar1_txt) at ($(ar2_start)+(-0.90cm,0)$) {Signing / Deployment Flow};
+\draw[flow_short] ($(ar1_txt.west)+(-0.72cm,0)$) -- ($(ar1_txt.west)+(-0.06cm,0)$);
+\coordinate (ar1_start) at ($(ar1_txt.west)+(-0.75cm,0)$);
+
+\node[font=\tiny, anchor=west] (ar3_txt) at ($(ar2_txt.east)+(1.62cm,0)$) {Verified TLS 1.3 Chain \& SAN Handshake};
+\draw[verify_arr] ($(ar3_txt.west)+(-0.72cm,0)$) -- ($(ar3_txt.west)+(-0.06cm,0)$);
+
+\coordinate (leg_flush_L) at (zone_3A.west |- leg_hdr.north);
+\coordinate (leg_flush_R) at (zone_3B.east |- ar3_txt.south);
+
+\begin{pgfonlayer}{background}
+    \node[rectangle, rounded corners=4pt, draw=pkiSlateLine!45, fill=pkiSlateFill,
+          line width=0.6pt, inner xsep=0pt, inner ysep=5pt,
+          fit=(leg_flush_L)(leg_flush_R)(leg_hdr)(leg_r1)(ar1_start)(ar3_txt)] (legend_bar) {};
+\end{pgfonlayer}
+
+\end{tikzpicture}%
+}
+\caption{Three-tier Public Key Infrastructure (PKI) and browser trust remediation architecture. Tier~1 establishes the offline 2048-bit RSA \texttt{COIL Group 2 Root CA} (\qty{3650}{days}); Tier~2 signs the leaf certificate (\texttt{server.crt}, \qty{825}{days}) with five DNS and four IPv4 Subject Alternative Names (SANs); Tier~3A deploys \texttt{fullchain.pem} to the dual-node TLS~1.3 server stack while Tier~3B imports \texttt{COIL\_Group2\_Root\_CA.crt} into Windows and Android root trust stores to eliminate \texttt{NET::ERR\_CERT\_AUTHORITY\_INVALID} warnings (bonus criterion).}
+\label{fig:pki_architecture}
+\end{figure*}

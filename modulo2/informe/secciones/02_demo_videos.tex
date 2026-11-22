@@ -1,0 +1,59 @@
+\section{Individual Demonstration Videos}
+\label{sec:demo_videos}
+
+Rubric Section~II allocates \qty{10}{\percent} of the Module~2 evaluation weight to individual English-language demonstration videos recorded independently by each group member. Rather than permitting shared group screencasts or numeric IP navigation, the activity specification mandates that each student establish an authenticated Software-Defined Wide Area Network (SD-WAN) session from their personal endpoint, access the partner institution's intranet strictly via its Fully Qualified Domain Name (FQDN) URL (\texttt{https://\allowbreak www.coil-group2.com/\allowbreak seneca/}), verify transport security, and narrate the partner cultural modules in English (spoken narration or synchronized English Text-to-Speech synthesis).
+
+For Universidad de los Llanos participants, the target demonstration portal is the Seneca Polytechnic cultural intranet (\texttt{https://\allowbreak www.coil-group2.com/\allowbreak seneca/}), complementing the reciprocal verification performed by Seneca Polytechnic partners toward the Universidad de los Llanos portal. Requiring domain-based addressing instead of raw IPv4 literals exercises the full application-delivery stack: local DNS resolution over UDP port~53~\cite{rfc1035}, HTTP \texttt{Host} header preservation for multi-tenant path routing under RFC~9110~\cite{rfc9110}, and TLS~1.3 Server Name Indication (SNI) validation against X.509 Subject Alternative Name (SAN) records under RFC~8446 and RFC~5280~\cite{rfc8446,rfc5280}.
+
+\begin{table*}[t]
+\centering
+\caption{Individual Demonstration Video Deliverables, Target Intranet URLs, Local Archives, and Restricted Hosting Slots}
+\label{tab:demo_videos}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{
+  >{\raggedright\arraybackslash}p{3.45cm}
+  >{\raggedright\arraybackslash}p{2.05cm}
+  >{\raggedright\arraybackslash}p{3.65cm}
+  >{\raggedright\arraybackslash}X
+  >{\raggedright\arraybackslash}p{3.15cm}
+}
+\toprule
+\textbf{Student \& Identifier} & \textbf{Institution} & \textbf{Target Intranet \& URL} & \textbf{Local Archive \& Script Reference} & \textbf{Delivery Link (Unlisted / Restricted)} \\
+\midrule
+\textbf{Miguel \'{A}ngel Rodr\'{i}guez Payares}\newline ID: \texttt{161004834} & Universidad de los Llanos & Seneca Polytechnic Intranet\newline \texttt{https://\allowbreak www.coil-group2.com/\allowbreak seneca/} & Archive: \texttt{modulo2/\allowbreak video/\allowbreak grabaciones/} (\texttt{20261121\_192309.mp4}--\texttt{20261121\_192830.mp4}); compiled demo: \texttt{COIL\_Module2\_\allowbreak Miguel\_Rodriguez\_\allowbreak Demo.mp4}; script: \texttt{modulo2/\allowbreak video/\allowbreak video\_script\_\allowbreak english.md} & \url{https://youtu.be/jrUnb2pqvwg}\newline (YouTube Unlisted) \\
+\addlinespace[4pt]
+\textbf{Luis Alejandro Le\'{o}n Vel\'{a}squez}\newline \texttt{laleon.velasquez@\allowbreak unillanos.edu.co} & Universidad de los Llanos & Seneca Polytechnic Intranet\newline \texttt{https://\allowbreak www.coil-group2.com/\allowbreak seneca/} & Script Ref.: \texttt{modulo2/\allowbreak video/\allowbreak video\_script\_\allowbreak english.md} (Part~2) & \texttt{[Insert Unlisted YouTube or Google Drive URL]} \\
+\bottomrule
+\end{tabularx}
+\end{table*}
+
+Table~\ref{tab:demo_videos} summarizes the individual video deliverables, institutional affiliations, target partner URLs, local repository archives, and instructor-restricted delivery slots for both Universidad de los Llanos authors.
+
+\subsection{Standardized Four-Scene English Demonstration Protocol}
+\label{subsec:video_protocol}
+
+To guarantee technical consistency and complete rubric coverage across both submissions, a unified four-scene demonstration script (\texttt{modulo2/\allowbreak video/\allowbreak video\_script\_\allowbreak english.md}) was authored with a target runtime of \qtyrange{90}{120}{\second} (\mbox{1:30--2:00~min}; paced at \mbox{1:55~min}). Each recording executes the following deterministic verification sequence:
+
+\begin{enumerate}
+    \item \textbf{Scene~1 (0:00--0:25) --- Student Introduction and ZeroTier Overlay IP Confirmation:} The student opens the recording in English, stating their full name, Electronic Engineering affiliation at Universidad de los Llanos (Villavicencio, Colombia), and the international COIL Module~2 scope with Seneca Polytechnic. Simultaneously, the screen displays the active ZeroTier One client or terminal interface verifying authorization in private SD-WAN network \texttt{abfd31bd47affa39} (\textit{COIL Group 2 SD-WAN - UniLlanos \& Seneca}) and confirming the host's assigned overlay IPv4 lease inside \texttt{172.22.0.0/16}---\texttt{172.22.201.2} for Miguel \'{A}ngel Rodr\'{i}guez Payares (host node \texttt{AED30A4FDD}) and \texttt{172.22.100.11} for Luis Alejandro Le\'{o}n Vel\'{a}squez (Windows client node \texttt{B63D8AEBA8})~\cite{zerotier2024}.
+
+    \item \textbf{Scene~2 (0:25--0:40) --- Domain-Based Navigation to Seneca Intranet:} Focusing on the browser address bar, the student manually enters \texttt{https://\allowbreak www.coil-group2.com/\allowbreak seneca/} rather than a numeric overlay IP address (such as \texttt{172.22.201.2} or \texttt{172.22.31.69}). Successful page rendering demonstrates real-time DNS resolution of \texttt{www.coil-group2.com} via the authoritative \texttt{dnslib} UDP/53 daemon~\cite{rfc1035}, confirms RFC~9110 HTTP \texttt{Host} header handling inside \texttt{COIL-DualIntranet/2.0}~\cite{rfc9110}, and satisfies the mandatory URL-only access requirement.
+
+    \item \textbf{Scene~3 (0:40--0:55) --- Live Browser Security Lock and X.509 Certificate Inspection:} Clicking the browser security padlock opens the live connection inspector (\textit{Connection is secure --- Certificate is valid}) and X.509 certificate viewer. The presenter confirms that the transport runs over HTTPS using TLS~1.3~\cite{rfc8446} on TCP port~443 (negotiating \texttt{TLS\_AES\_256\_\allowbreak GCM\_SHA384}) and traces the certificate trust chain from the leaf certificate (\texttt{CN = www.coil-group2.com}, SAN-bound to the COIL domain and overlay endpoints) to the locally installed \texttt{COIL Group 2 Root CA}~\cite{rfc5280}. Pre-installing the private Root CA into the operating system trust store eliminates all browser untrusted-certificate warnings during the live capture, satisfying the rubric's bonus criterion.
+
+    \item \textbf{Scene~4 (0:55--1:55) --- Cultural Walkthrough and Reciprocal Intranet Routing:} The presenter scrolls through the Seneca Polytechnic portal (\texttt{modulo2/\allowbreak sitio\_web/\allowbreak seneca/\allowbreak index.html}) while narrating each thematic section: (a)~\textit{Toronto Metropolis \& Landmarks}, highlighting the \qty{553.3}{\meter} CN Tower \& Downtown Skyline alongside Lake Ontario \& the Toronto Islands; (b)~\textit{Canadian Heritage \& Winter Life}, covering Ice Hockey \& Outdoor Rinks and Maple Syrup \& Sugar Shacks; (c)~\textit{Canadian Culinary Classics}, featuring Quebec Poutine and St.~Lawrence Market Peameal Bacon \& Butter Tarts; and (d)~\textit{Academic \& Telecommunications Partnership}, detailing Seneca Polytechnic's School of Information Technology and the bilateral UniLlanos--Seneca COIL exchange. After reviewing the top telemetry strip (\textit{Host}: Seneca Node -- Partner Gateway; \textit{Network}: COIL Group~2 SD-WAN; \textit{Domain}: \texttt{www.coil-group2.com/\allowbreak seneca/}; \textit{Security}: TLS~1.3 Certified on port~443), the presenter clicks the header button labeled \textit{Switch to UniLlanos Intranet} (\texttt{href="/unillanos/"}), verifying reciprocal routing to \texttt{https://\allowbreak www.coil-group2.com/\allowbreak unillanos/} over the same encrypted HTTPS origin~\cite{rfc9110,rfc8446}.
+\end{enumerate}
+
+\subsection{Privacy Controls and Repository Evidence}
+\label{subsec:video_privacy}
+
+Per the privacy directives in \texttt{modulo2/\allowbreak pasos\_actividad\_\allowbreak modulo2.txt}, individual video submissions must never be uploaded with \textit{Public} visibility because the screen recordings expose internal SD-WAN overlay topology, ZeroTier node identifiers, and student institutional metadata. Approved hosting channels are strictly limited to:
+\begin{itemize}
+    \item \textbf{YouTube (Unlisted):} Accessible exclusively via the direct URL embedded in Table~\ref{tab:demo_videos}, excluded from public search indexing and channel feeds.
+    \item \textbf{Institutional OneDrive:} Shared explicitly within the university Microsoft~365 tenant or via instructor-scoped viewing permissions.
+    \item \textbf{Google Drive (Restricted Link):} Shared with view-only access granted to the evaluating instructor.
+\end{itemize}
+
+Local source captures for Miguel \'{A}ngel Rodr\'{i}guez Payares are preserved in \texttt{modulo2/\allowbreak video/\allowbreak grabaciones/} (\texttt{20261121\_192309.mp4} through \texttt{20261121\_192830.mp4}) alongside the consolidated render \texttt{modulo2/\allowbreak video/\allowbreak COIL\_Module2\_\allowbreak Miguel\_Rodriguez\_\allowbreak Demo.mp4}, while both presenters' spoken/TTS narration timelines are archived in \texttt{modulo2/\allowbreak video/\allowbreak video\_script\_\allowbreak english.md}. Once uploaded to the designated non-public cloud host, the final URLs replace the placeholder slots in Table~\ref{tab:demo_videos} prior to PDF distribution.

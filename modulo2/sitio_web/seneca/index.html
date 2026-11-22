@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seneca Polytechnic Intranet - COIL Cultural &amp; Technology Exchange</title>
+  <style>
+    :root {
+      --primary: #dc2626;
+      --primary-dark: #991b1b;
+      --accent: #38bdf8;
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --green-badge: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 2px solid var(--primary);
+      padding: 0.55rem 1.75rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      color: white;
+    }
+    .brand-text h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 0.9rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+    .btn-partner {
+      background: #c2410c;
+      color: white !important;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600 !important;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-partner:hover {
+      background: #9a3412;
+      transform: translateY(-2px);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.5rem 1.75rem;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+      border-radius: 16px;
+      padding: 2.2rem 1.5rem 1.8rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid var(--primary);
+      text-align: center;
+      position: relative;
+    }
+    .hero h2 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-bottom: 0.6rem;
+      color: #fff;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      color: #cbd5e1;
+      max-width: 800px;
+      margin: 0 auto 1.25rem auto;
+    }
+    .telemetry-bar {
+      display: inline-flex;
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.5rem 1.25rem;
+      border-radius: 50px;
+      gap: 1.25rem;
+      border: 1px solid var(--primary);
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .telemetry-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      background: var(--green-badge);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--green-badge);
+    }
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 8px;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.5);
+      border-color: var(--primary);
+    }
+    .card-img-wrap {
+      width: 100%;
+      height: 240px;
+      overflow: hidden;
+      background: #1e293b;
+      position: relative;
+    }
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .card:hover .card-img {
+      transform: scale(1.06);
+    }
+    .card-body {
+      padding: 1.75rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      flex: 1;
+    }
+    .icon-box {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding-top: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 0.5rem 1rem;
+      }
+      .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.6rem;
+      }
+      .brand {
+        justify-content: flex-start;
+      }
+      .nav-links {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        gap: 0.65rem;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav-links a {
+        white-space: nowrap;
+        font-size: 0.78rem;
+      }
+      .btn-partner {
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 0.35rem;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+      }
+      .container {
+        padding: 1rem 0.75rem;
+      }
+      .hero {
+        padding: 1.75rem 1rem 1.5rem;
+        margin-bottom: 1.75rem;
+        border-radius: 12px;
+      }
+      .hero h2 {
+        font-size: 1.6rem;
+        line-height: 1.25;
+      }
+      .hero p {
+        font-size: 0.92rem;
+        line-height: 1.5;
+      }
+      .telemetry-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+        width: 100%;
+      }
+      .telemetry-item {
+        font-size: 0.78rem;
+      }
+      .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+      }
+      .card-img-wrap {
+        height: 200px;
+      }
+      .card-body {
+        padding: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">SC</div>
+        <div class="brand-text">
+          <h1>Seneca Polytechnic</h1>
+          <p>School of Information Technology &bull; COIL SD-WAN Intranet</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#toronto">Toronto Life</a>
+        <a href="#canadian-culture">Traditions &amp; Winter</a>
+        <a href="#gastronomy">Canadian Food</a>
+        <a href="#academics">Seneca Tech</a>
+        <a href="/unillanos/" class="btn-partner">&larr; Switch to UniLlanos Intranet</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <section class="hero">
+      <h2>Welcome to Seneca Polytechnic Intranet</h2>
+      <p>Located in Toronto, Ontario, Canada. Connected via ZeroTier SD-WAN and encrypted HTTPS to our international partners at Universidad de los Llanos (Villavicencio, Colombia).</p>
+      
+      <div class="telemetry-bar">
+        <div class="telemetry-item">
+          <span class="status-dot"></span>
+          <span><strong>Host:</strong> Seneca Node - Partner Gateway</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>Network:</strong> COIL Group 2 SD-WAN</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>Domain:</strong> www.coil-group2.com/seneca/</span>
+        </div>
+        <div class="telemetry-item">
+          <span><strong>Security:</strong> TLS 1.3 Certified (Port 443)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TORONTO SECTION -->
+    <section id="toronto">
+      <h3 class="section-title">Toronto Metropolis &amp; Landmarks</h3>
+      <div class="grid">
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/toronto_skyline.jpg" alt="CN Tower and Downtown Toronto Skyline" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Iconic Architecture</span>
+            <h4 class="card-title">CN Tower &amp; Downtown Skyline</h4>
+            <p class="card-desc">Standing at 553.3 meters along Lake Ontario, the CN Tower defines the Toronto skyline. Toronto is one of the most culturally diverse metropolises in North America, with over 200 distinct ethnic origins and vibrant multicultural neighborhoods.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/lake_ontario.jpg" alt="Lake Ontario Waterfront and Toronto Islands" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Culture &amp; Nature</span>
+            <h4 class="card-title">Lake Ontario &amp; Toronto Islands</h4>
+            <p class="card-desc">Just minutes from downtown by ferry, the Toronto Islands offer tranquil green spaces, car-free bicycle trails, and panoramic sunset views back toward the bustling financial core and harborfront promenade.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRADITIONS & WINTER SECTION -->
+    <section id="canadian-culture">
+      <h3 class="section-title">Canadian Heritage &amp; Winter Life</h3>
+      <div class="grid">
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/ice_hockey.jpg" alt="Canadian Ice Hockey Match and Outdoor Rink" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">National Passion</span>
+            <h4 class="card-title">Ice Hockey &amp; Outdoor Rinks</h4>
+            <p class="card-desc">Hockey is woven into the Canadian identity. From neighborhood shinny games on frozen backyard ponds to cheering for the Toronto Maple Leafs at Scotiabank Arena, winter is celebrated outdoors with skates, sticks, and cold-weather camaraderie.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/maple_syrup.jpg" alt="Pure Canadian Maple Syrup Production" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Seasonal Ritual</span>
+            <h4 class="card-title">Maple Syrup &amp; Sugar Shacks</h4>
+            <p class="card-desc">Every spring as days warm above freezing, sugar maples across Ontario and Quebec are tapped. The sap is boiled down into pure golden maple syrup, celebrated at local sugar shacks with fresh hot syrup poured directly over clean snow to form maple taffy.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GASTRONOMY SECTION -->
+    <section id="gastronomy">
+      <h3 class="section-title">Canadian Culinary Classics</h3>
+      <div class="grid">
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/poutine.jpg" alt="Classic Canadian Poutine with Cheese Curds and Gravy" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Comfort Food</span>
+            <h4 class="card-title">Authentic Poutine</h4>
+            <p class="card-desc">Originating in Quebec in the late 1950s, classic poutine features hot, crispy hand-cut french fries topped with fresh squeaky cheddar cheese curds and smothered in a rich, piping-hot savory brown gravy that slightly melts the cheese.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/peameal_bacon.jpg" alt="Peameal Bacon Sandwich from St. Lawrence Market" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Market Traditions</span>
+            <h4 class="card-title">Peameal Bacon &amp; Butter Tarts</h4>
+            <p class="card-desc">A Toronto staple: wet-cured lean pork loin rolled in ground cornmeal, sliced thick and grilled on a soft bun at St. Lawrence Market. For dessert, traditional butter tarts with a flaky pastry crust and gooey brown sugar filling.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SENECA ACADEMICS & BILATERAL COIL -->
+    <section id="academics">
+      <h3 class="section-title">Academic &amp; Telecommunications Partnership</h3>
+      <div class="grid">
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/seneca_campus.jpg" alt="Seneca Polytechnic Modern Campus" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Program Excellence</span>
+            <h4 class="card-title">School of Information Technology</h4>
+            <p class="card-desc">Seneca Polytechnic prepares students in computer networking, cloud architectures, cybersecurity, and telecommunications through applied project-based learning and international collaborative partnerships.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-img-wrap">
+            <img src="img/toronto_skyline.jpg" alt="COIL International Exchange" class="card-img" loading="lazy">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Bilateral Synergy</span>
+            <h4 class="card-title">UniLlanos &bull; Seneca COIL Exchange</h4>
+            <p class="card-desc">Bridging geographical distance through Software-Defined Wide Area Networking. This joint initiative connects engineering students across the Americas, validating encrypted communications, DNS service delivery, and cross-cultural understanding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>COIL International Collaboration Project &bull; Seneca Polytechnic (Toronto) &amp; Universidad de los Llanos (Villavicencio)</p>
+    <p>Secure SD-WAN Intranet &bull; TLS 1.3 Self-Signed PKI Infrastructure</p>
+  </footer>
+
+</body>
+</html>

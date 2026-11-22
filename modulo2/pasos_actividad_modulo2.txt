@@ -1,0 +1,140 @@
+================================================================================
+ACTIVIDAD GRUPAL - MÓDULO 2 (80%)
+Proyecto COIL: Seneca & UniLlanos
+Título: Creating a SD-WAN and Intranet Websites
+Fechas: Oct. 18 - Nov. 15
+Idioma del informe final: Inglés (Un solo informe por grupo)
+================================================================================
+
+--------------------------------------------------------------------------------
+DESCRIPCIÓN GENERAL Y OBJETIVOS
+--------------------------------------------------------------------------------
+El objetivo de esta actividad grupal es conectar de forma segura las redes de
+ambas instituciones (Seneca College y Universidad de los Llanos) mediante una
+SD-WAN (Software Defined Wide Area Network) usando ZeroTier, desplegar sitios
+web intranet protegidos por HTTPS en cada institución con contenido cultural,
+configurar resolución de nombres de dominio (DNS), capturar y analizar el tráfico
+con Wireshark, y generar la documentación técnica en inglés junto con grabaciones
+en video individuales.
+
+================================================================================
+PASO A PASO DE LA ACTIVIDAD
+================================================================================
+
+--------------------------------------------------------------------------------
+PARTE 1: IMPLEMENTACIÓN DE SD-WAN CON ZEROTIER
+--------------------------------------------------------------------------------
+1. Crear una red en ZeroTier Central (https://www.zerotier.com/).
+2. Conectar cada uno de los equipos de los integrantes del grupo a la red SD-WAN:
+   - Debe haber un PC (o servidor) conectado por cada estudiante del grupo.
+3. En la consola de ZeroTier Central:
+   - Autorizar cada dispositivo.
+   - Asignar nombres/etiquetas claras a cada PC con el nombre de cada estudiante.
+   - En el PC que aloje el sitio web, indicar explícitamente en la etiqueta que
+     es el servidor web (Ejemplo: "Nombre Estudiante + Website").
+4. Tomar capturas de pantalla de la asignación de IPs en ZeroTier Central y de las
+   direcciones IP asignadas localmente en cada máquina (para la Sección 1 del informe).
+
+--------------------------------------------------------------------------------
+PARTE 2: CREACIÓN DE 2 SITIOS WEB INTRANET (ACCESO POR IP Y POR URL)
+--------------------------------------------------------------------------------
+1. Configuración de Servidores Web:
+   - Se debe configurar 1 PC en Seneca como servidor web.
+   - Se debe configurar 1 PC en UniLlanos como servidor web.
+2. Contenido de los Sitios Web:
+   - Cada página web debe estar cargada con la información cultural y las fotos
+     de la Parte A (intercambio cultural).
+3. Acceso Cruzado entre Instituciones:
+   - Los estudiantes de Seneca deben acceder al sitio web creado por UniLlanos.
+   - Los estudiantes de UniLlanos deben acceder al sitio web creado por Seneca.
+4. Configuración de Servidor DNS y Resolución por URL:
+   - Los estudiantes de Seneca deben crear y configurar un servidor DNS dentro de la red.
+   - Ambos sitios web deben ser accesibles mediante nombres de dominio (URLs), NO solo por IP.
+   - Deben existir 2 URLs distintas para las 2 intranets.
+     Ejemplo:
+       www.[dominioejemplo].com/seneca/
+       www.[dominioejemplo].com/unillanos/
+5. Configuración de HTTPS con Certificados Autofirmados:
+   - Es obligatorio usar el protocolo HTTPS (HTTP no está permitido).
+   - Generar e instalar un certificado SSL/TLS autofirmado (self-signed certificate)
+     en los servidores web.
+   - Es aceptable ver la advertencia de navegador ("The site's security certificate
+     is not trusted!") y proceder.
+   - PUNTOS EXTRA (BONUS): Se otorgarán puntos adicionales si se resuelve este error
+     (por ejemplo, instalando el certificado CA raíz autofirmado en el almacén de
+     certificados de confianza de los clientes). Los pasos para resolverlo deben
+     incluirse en el manual.
+6. Captura de Tráfico con Wireshark:
+   - Ejecutar Wireshark en el PC cliente mientras se accede al sitio web de la institución socia.
+   - Aplicar filtros para visualizar únicamente el tráfico relevante dirigido al sitio web.
+   - Guardar la captura en formato .pcap o .pcapng (LÍMITE: menor a 10 MB).
+
+================================================================================
+PARTE 3: DOCUMENTACIÓN Y ENTREGABLES (INFORME FINAL EN INGLÉS)
+================================================================================
+El informe debe enviarse en inglés y estructurarse exactamente en las siguientes
+4 secciones:
+
+--------------------------------------------------------------------------------
+SECCIÓN 1 (5%): ASIGNACIÓN DE IPS EN ZEROTIER
+--------------------------------------------------------------------------------
+- Capturas de pantalla que muestren la asignación de IPs en ZeroTier (panel web
+  de ZeroTier Central) y las direcciones IP configuradas en cada PC/servidor.
+- Verificación de que cada estudiante del grupo tenga su PC conectado a la SD-WAN.
+- Cada PC debe estar etiquetado con el nombre del estudiante correspondiente.
+- El PC que aloja el servidor web debe indicar claramente su rol (ej: "Nombre + Website").
+
+--------------------------------------------------------------------------------
+SECCIÓN 2 (10%): VIDEOS DEMOSTRATIVOS INDIVIDUALES
+--------------------------------------------------------------------------------
+- Enlaces (URLs) a grabaciones de video cortas demostrando el acceso al sitio web
+  de la institución socia mediante URL (no mediante IP).
+- Requisitos del video:
+  * Todo el audio/voz debe ser en inglés (se permite usar aplicaciones de Texto a Voz / TTS).
+  * Los estudiantes de Seneca se presentan en video y muestran el acceso al sitio
+    web de UniLlanos, mostrando parte de su contenido.
+  * Los estudiantes de UniLlanos se presentan en video y muestran el acceso al sitio
+    web de Seneca, mostrando parte de su contenido.
+  * CADA ESTUDIANTE DEBE GRABAR SU PROPIO VIDEO INDIVIDUAL e incluir su enlace en el
+    informe para recibir la calificación de esta sección.
+  * Privacidad: NO hacer los videos públicos. Deben estar disponibles para el profesor
+    usando:
+      - YouTube (como video Oculto / Unlisted)
+      - OneDrive (compartido con la institución)
+      - Google Drive (con permisos de acceso para el profesor)
+
+--------------------------------------------------------------------------------
+SECCIÓN 3 (15%): ARCHIVO PCAP Y CAPTURAS DE WIRESHARK
+--------------------------------------------------------------------------------
+- Adjuntar el archivo de captura Wireshark (.pcap o .pcapng) de tamaño MENOR A 10 MB.
+- Incluir en el reporte 4 capturas de pantalla específicas:
+  1. Captura de Wireshark con el filtro aplicado mostrando únicamente el tráfico
+     hacia el sitio web de la institución socia.
+  2. Captura de paquetes mostrando la negociación TCP inicial (SYN, SYN-ACK, ACK).
+  3. Captura de paquetes mostrando el intercambio de datos del sitio web (tráfico HTTPS / TLS).
+  4. Captura de paquetes mostrando el cierre de la conexión TCP (FIN / ACK / RST).
+
+--------------------------------------------------------------------------------
+SECCIÓN 4 (50%): 4 GUÍAS DETALLADAS PASO A PASO (MANUALES) + CÓDIGO FUENTE
+--------------------------------------------------------------------------------
+Debe incluir 4 manuales exhaustivos paso a paso:
+1. (10%) Guía de creación y configuración de la red ZeroTier SD-WAN.
+2. (10%) Manual de creación del servidor web y despliegue del código del sitio web.
+3. (15%) Manual de configuración del certificado autofirmado y protocolo HTTPS
+   (incluir solución de advertencia de certificado para puntos bonus).
+4. (15%) Manual de creación y configuración del servidor DNS.
+
+APÉNDICE:
+- Incluir en la documentación el código fuente completo del sitio web desarrollado
+  por la institución.
+
+================================================================================
+RESUMEN DE PONDERACIÓN TOTAL (MÓDULO 2 = 80%)
+================================================================================
+- Sección 1: Asignación ZeroTier y etiquetado de equipos ........  5%
+- Sección 2: Enlaces a videos individuales de navegación ........ 10%
+- Sección 3: Captura Wireshark (<10MB) y 4 capturas de paquetes . 15%
+- Sección 4: 4 Manuales paso a paso + Apéndice de código ....... 50%
+--------------------------------------------------------------------------------
+Total Módulo 2: ................................................ 80%
+================================================================================

@@ -1,0 +1,87 @@
+================================================================================
+ACTIVIDAD INDIVIDUAL - MÓDULO 3 (10%)
+Proyecto COIL: Seneca & UniLlanos
+Título: Lessons Learned from COIL (Reflection)
+Fechas: Nov. 16 - Nov. 22
+Modalidad: Individual (Cada estudiante completa y entrega su propia reflexión)
+Idioma de entrega: Inglés
+================================================================================
+
+--------------------------------------------------------------------------------
+DESCRIPCIÓN GENERAL
+--------------------------------------------------------------------------------
+El Módulo 3 corresponde a la reflexión final del proyecto COIL. A diferencia
+del Módulo 2 (que fue grupal), esta actividad es estrictamente INDIVIDUAL.
+Consta de dos partes evaluadas equitativamente (5% cada una para un total de 10%).
+
+================================================================================
+ACTIVIDADES REQUERIDAS
+================================================================================
+
+--------------------------------------------------------------------------------
+1. ANÁLISIS DE INCIDENTE CRÍTICO / CRITICAL INCIDENT ANALYSIS (5%)
+--------------------------------------------------------------------------------
+Debe completarse en idioma inglés bajo UNA de las siguientes dos modalidades a
+elección del estudiante:
+
+- OPCIÓN A (Texto escrito):
+  * Redactar un resumen en inglés de exactamente o aproximadamente 300 palabras.
+  ó
+- OPCIÓN B (Video):
+  * Grabar un video en inglés de 1 minuto de duración.
+
+Requisitos específicos del incidente crítico:
+- Debe describir un momento o situación específica ocurrida durante la interacción
+  intercultural que haya representado un desafío o dificultad.
+- Debe estar basado en una situación real experimentada durante el desarrollo
+  del proyecto COIL.
+- Es indispensable explicar de manera clara cómo se resolvió la situación o
+  conflicto (estrategia de comunicación, acuerdo técnico, adaptación horaria, etc.).
+
+Estructura recomendada para el texto o guion del video:
+1. Contexto breve del desafío (qué ocurrió y cuándo).
+2. Impacto o dificultad experimentada (barrera idiomática, diferencia de huso horario,
+   diferencias técnicas de configuración o acuerdos de equipo).
+3. Acciones tomadas para resolverlo (solución implementada).
+4. Aprendizaje o conclusión de la experiencia intercultural.
+
+--------------------------------------------------------------------------------
+2. CRECIMIENTO Y DESARROLLO ACADÉMICO / ACADEMIC GROWTH AND DEVELOPMENT (5%)
+--------------------------------------------------------------------------------
+Responder de forma detallada, analítica y en inglés a las siguientes dos preguntas:
+
+Pregunta 1:
+"Through the course of the COIL project and your participation in it, explain which
+part(s) of the project you were responsible for, and what new technical skills you
+have developed while completing your portion of the project."
+
+Traducción y guía de respuesta:
+- Explicar detalladamente de qué parte(s) del proyecto fuiste responsable directo
+  (ejemplo: configuración del cliente/nodo ZeroTier, despliegue del servidor web,
+  generación e instalación de certificados autofirmados HTTPS, análisis de paquetes
+  con Wireshark, redacción de manuales, etc.).
+- Detallar qué nuevas habilidades técnicas desarrollaste durante la ejecución de
+  dichas tareas (ejemplo: manejo de SD-WAN con ZeroTier, captura y filtrado TCP/TLS
+  en Wireshark, configuración de servidores web Apache/Nginx, depuración de certificados SSL).
+
+Pregunta 2:
+"Compare what you have completed in the project to the original Group Contract that
+was signed. Was the group contract followed? Please elaborate and reflect on why
+the contract was or wasn't followed."
+
+Traducción y guía de respuesta:
+- Comparar lo que efectivamente se realizó en el proyecto frente al Acuerdo de Grupo
+  (Group Contract) firmado al inicio de la colaboración.
+- Analizar si se cumplieron o no los compromisos pactados (plazos de entrega, canales
+  de comunicación, distribución equitativa de cargas de trabajo, asistencia a reuniones).
+- Reflexionar y profundizar en los motivos de por qué se cumplió o por qué hubo
+  desviaciones respecto al contrato original.
+
+================================================================================
+RESUMEN DE PONDERACIÓN (MÓDULO 3 = 10%)
+================================================================================
+- Parte 1: Critical Incident Analysis (Texto 300 palabras o video 1 min) ...  5%
+- Parte 2: Academic Growth and Development (Respuestas a Preguntas 1 y 2) ...  5%
+--------------------------------------------------------------------------------
+Total Módulo 3: ........................................................... 10%
+================================================================================

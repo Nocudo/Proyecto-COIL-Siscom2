@@ -1,0 +1,303 @@
+\begin{figure*}[htbp]
+\centering
+\resizebox{0.84\textwidth}{!}{%
+\begin{tikzpicture}[
+    >=Stealth,
+    every node/.style={font=\scriptsize, text=black!88},
+    /utils/exec={
+        \definecolor{figTwoSlate}{HTML}{1E293B}
+        \definecolor{figTwoMuted}{HTML}{475569}
+        \definecolor{figTwoRule}{HTML}{CBD5E1}
+        \definecolor{figTwoDnsAccent}{HTML}{0F766E}
+        \definecolor{figTwoDnsFill}{HTML}{F0FDFA}
+        \definecolor{figTwoDnsBadge}{HTML}{CCFBF1}
+        \definecolor{figTwoTcpAccent}{HTML}{1D4ED8}
+        \definecolor{figTwoTcpFill}{HTML}{EFF6FF}
+        \definecolor{figTwoTcpBadge}{HTML}{DBEAFE}
+        \definecolor{figTwoTlsAccent}{HTML}{6D28D9}
+        \definecolor{figTwoTlsFill}{HTML}{F5F3FF}
+        \definecolor{figTwoTlsBadge}{HTML}{EDE9FE}
+        \definecolor{figTwoDataAccent}{HTML}{047857}
+        \definecolor{figTwoDataFill}{HTML}{ECFDF5}
+        \definecolor{figTwoDataBadge}{HTML}{D1FAE5}
+        \definecolor{figTwoFinAccent}{HTML}{B45309}
+        \definecolor{figTwoFinFill}{HTML}{FFFBEB}
+        \definecolor{figTwoFinBadge}{HTML}{FEF3C7}
+    },
+    endpoint/.style={
+        rectangle, rounded corners=3pt, draw=figTwoSlate, fill=white,
+        line width=0.9pt, align=center, inner xsep=4pt, inner ysep=5pt,
+        minimum height=1.24cm, font=\scriptsize
+    },
+    endpoint_foot/.style={
+        rectangle, rounded corners=2.5pt, draw=figTwoSlate, fill=figTwoSlate!6,
+        line width=0.7pt, align=center, inner xsep=4pt, inner ysep=3.5pt,
+        font=\scriptsize\bfseries, text=figTwoSlate
+    },
+    phase_badge/.style={
+        rectangle, rounded corners=2.5pt, align=center,
+        text width=1.46cm, inner xsep=3pt, inner ysep=4.5pt,
+        line width=0.7pt, font=\scriptsize\bfseries
+    },
+    telemetry_card/.style={
+        rectangle, rounded corners=3pt, align=left,
+        text width=5.35cm, inner xsep=6pt, inner ysep=5pt,
+        line width=0.65pt, fill=white, font=\scriptsize
+    },
+    msg_arrow/.style={
+        -{Stealth[length=5pt 1.2, width'=0pt 0.65]},
+        line width=0.85pt, shorten >=1.5pt, shorten <=1.5pt
+    },
+    msg_burst/.style={
+        -{Stealth[length=6pt 1.2, width'=0pt 0.65]},
+        line width=1.5pt, shorten >=1.5pt, shorten <=1.5pt
+    },
+    msg_ack/.style={
+        -{Stealth[length=4.5pt 1.1, width'=0pt 0.6]},
+        line width=0.7pt, dashed, shorten >=1.5pt, shorten <=1.5pt
+    },
+    msg_label/.style={
+        anchor=south, yshift=2.2pt, align=center, inner sep=1pt,
+        font=\scriptsize, text=figTwoSlate
+    },
+    lifeline/.style={
+        dashed, line width=0.75pt, color=figTwoMuted!65
+    }
+]
+
+\node[endpoint, text width=2.95cm, fill=figTwoTcpFill!65, draw=figTwoTcpAccent] (client_hdr) at (0,0) {%
+    \textbf{\color{figTwoTcpAccent}UniLlanos Client Host}\\[2pt]
+    \texttt{172.22.201.2:52382}\\[2pt]
+    {\tiny\color{figTwoMuted}TLS 1.3 / HTTPS Client}%
+};
+
+\node[endpoint, text width=3.40cm, fill=figTwoSlate!5, draw=figTwoSlate, right=3.45cm of client_hdr] (server_hdr) {%
+    \textbf{\color{figTwoSlate}Seneca Gateway}\\[2pt]
+    \texttt{172.22.31.69}\\[2pt]
+    {\tiny\color{figTwoMuted}HTTPS :443 \textbar{} DNS Client :51420}%
+};
+
+\node[endpoint, text width=2.85cm, fill=figTwoDnsFill!75, draw=figTwoDnsAccent, right=1.95cm of server_hdr] (dns_hdr) {%
+    \textbf{\color{figTwoDnsAccent}UniLlanos Auth DNS}\\[2pt]
+    \texttt{172.22.201.2:53}\\[2pt]
+    {\tiny\color{figTwoMuted}\texttt{dns\_server.py} (UDP)}%
+};
+
+\node[left=0.22cm of client_hdr, minimum width=1.64cm, minimum height=1.24cm, inner sep=0pt] (phase_hdr_anchor) {};
+\node[align=center, font=\scriptsize\bfseries, text=figTwoMuted] at (phase_hdr_anchor.center) {Protocol\\[2pt]Phase};
+
+\coordinate (hdr_mid) at ($(phase_hdr_anchor.north west)!0.5!(dns_hdr.north east)$);
+\node[anchor=south, font=\small\bfseries, text=figTwoSlate, inner sep=2pt] (fig_title) at ($(hdr_mid)+(0,0.42)$)
+    {SD-WAN DNS, TCP, and TLS 1.3 Sequence (38 Frames)};
+
+\coordinate (t_start) at (phase_hdr_anchor.south);
+
+\coordinate (r_p0_top)  at ($(t_start)+(0,-0.38)$);
+\coordinate (r_f1)      at ($(r_p0_top)+(0,-0.88)$);
+\coordinate (r_f2)      at ($(r_f1)+(0,-1.05)$);
+\coordinate (r_dns_end) at ($(r_f2)+(0,-0.58)$);
+\coordinate (r_p0_bot)  at ($(r_dns_end)+(0,-0.52)$);
+
+\coordinate (r_p1_top)  at ($(r_p0_bot)+(0,-0.22)$);
+\coordinate (r_f3)      at ($(r_p1_top)+(0,-0.88)$);
+\coordinate (r_f4)      at ($(r_f3)+(0,-1.02)$);
+\coordinate (r_f5)      at ($(r_f4)+(0,-0.78)$);
+\coordinate (r_p1_bot)  at ($(r_f5)+(0,-0.32)$);
+
+\coordinate (r_p2_top)  at ($(r_p1_bot)+(0,-0.22)$);
+\coordinate (r_f6)      at ($(r_p2_top)+(0,-0.92)$);
+\coordinate (r_f9)      at ($(r_f6)+(0,-1.10)$);
+\coordinate (r_f13)     at ($(r_f9)+(0,-0.78)$);
+\coordinate (r_f14)     at ($(r_f13)+(0,-0.76)$);
+\coordinate (r_f15)     at ($(r_f14)+(0,-0.78)$);
+\coordinate (r_p2_bot)  at ($(r_f15)+(0,-0.32)$);
+
+\coordinate (r_p3_top)  at ($(r_p2_bot)+(0,-0.22)$);
+\coordinate (r_f16)     at ($(r_p3_top)+(0,-0.95)$);
+\coordinate (r_f18)     at ($(r_f16)+(0,-0.92)$);
+\coordinate (r_p3_bot)  at ($(r_f18)+(0,-0.32)$);
+
+\coordinate (r_p4_top)  at ($(r_p3_bot)+(0,-0.22)$);
+\coordinate (r_f35)     at ($(r_p4_top)+(0,-0.95)$);
+\coordinate (r_f36)     at ($(r_f35)+(0,-0.82)$);
+\coordinate (r_f37)     at ($(r_f36)+(0,-0.84)$);
+\coordinate (r_f38)     at ($(r_f37)+(0,-0.80)$);
+\coordinate (r_p4_bot)  at ($(r_f38)+(0,-0.32)$);
+
+\coordinate (r_foot)    at ($(r_p4_bot)+(0,-0.32)$);
+
+\node[endpoint_foot, anchor=north, text width=2.95cm] (client_foot) at (r_foot -| client_hdr.south) {Client Socket Closed};
+\node[endpoint_foot, anchor=north, text width=3.40cm] (server_foot) at (r_foot -| server_hdr.south) {Server Socket Closed};
+
+\node[rectangle, rounded corners=2.5pt, draw=figTwoDnsAccent, fill=figTwoDnsBadge,
+      line width=0.7pt, align=center, text width=2.85cm, font=\scriptsize\bfseries, text=figTwoDnsAccent,
+      inner xsep=4pt, inner ysep=3.5pt]
+      (dns_done) at (r_dns_end -| dns_hdr.south)
+      {DNS Cached (\qty{0.53}{\milli\second})\\[2pt]{\tiny TTL \qty{300}{\second} (A Record)}};
+
+\draw[lifeline] (client_hdr.south) -- (client_foot.north);
+\draw[lifeline] (server_hdr.south) -- (server_foot.north);
+\draw[lifeline] (dns_hdr.south)    -- (dns_done.north);
+
+\draw[msg_arrow, color=figTwoDnsAccent] (r_f1 -| server_hdr.south) -- (r_f1 -| dns_hdr.south)
+    node[midway, msg_label, text width=4.85cm] {%
+        \textbf{F1} [0.0000\,s]: Query \texttt{0x9121} (\qty{79}{\byte})\\[1.8pt]
+        \texttt{A www.coil-group2.com}%
+    };
+
+\draw[msg_arrow, color=figTwoDnsAccent] (r_f2 -| dns_hdr.south) -- (r_f2 -| server_hdr.south)
+    node[midway, msg_label, text width=4.85cm] {%
+        \textbf{F2} [0.0005\,s]: Auth Resp (\qty{95}{\byte})\\[1.8pt]
+        \texttt{A 172.22.201.2} (TTL \qty{300}{\second}, \qty{0.53}{\milli\second})%
+    };
+
+\draw[msg_arrow, color=figTwoTcpAccent] (r_f3 -| client_hdr.south) -- (r_f3 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F3} [0.2392\,s]: \texttt{[SYN]} Seq=0, Win=65535\\[1.8pt]
+        MSS=\qty{1260}{\byte}, WS=256, SACK\_PERM%
+    };
+
+\draw[msg_arrow, color=figTwoTcpAccent] (r_f4 -| server_hdr.south) -- (r_f4 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F4} [0.2535\,s]: \texttt{[SYN, ACK]} Seq=0, Ack=1 (\qty{14.21}{\milli\second} RTT)\\[1.8pt]
+        Win=65535, MSS=\qty{1260}{\byte}, WS=256%
+    };
+
+\draw[msg_arrow, color=figTwoTcpAccent] (r_f5 -| client_hdr.south) -- (r_f5 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F5} [0.2536\,s]: \texttt{[ACK]} Seq=1, Ack=1, Win=65280%
+    };
+
+\draw[msg_arrow, color=figTwoTlsAccent] (r_f6 -| client_hdr.south) -- (r_f6 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F6--7} [0.2544\,s]: \texttt{Client Hello} (\qty{1479}{\byte} reasm.)\\[1.8pt]
+        \texttt{SNI=www.coil-group2.com}, offers \texttt{0x1302/03/01}%
+    };
+
+\draw[msg_arrow, color=figTwoTlsAccent] (r_f9 -| server_hdr.south) -- (r_f9 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F9--12} [0.2732\,s]: \texttt{Server Hello}, CCS, Enc.\ Ext., Cert, Fin.\\[1.8pt]
+        Cipher: \texttt{TLS\_AES\_256\_GCM\_SHA384} (1-RTT)%
+    };
+
+\draw[msg_arrow, color=figTwoTlsAccent] (r_f13 -| client_hdr.south) -- (r_f13 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F13} [0.2744\,s]: Client \texttt{CCS + Finished} (\qty{80}{\byte})%
+    };
+
+\draw[msg_arrow, color=figTwoTlsAccent] (r_f14 -| server_hdr.south) -- (r_f14 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F14} [0.2874\,s]: \texttt{NewSessionTicket} (\qty{255}{\byte})%
+    };
+
+\draw[msg_arrow, color=figTwoTlsAccent] (r_f15 -| client_hdr.south) -- (r_f15 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F15} [0.2874\,s]: Encrypted \texttt{GET /seneca/ HTTP/1.1} (\qty{124}{\byte})%
+    };
+
+\draw[msg_burst, color=figTwoDataAccent] (r_f16 -| server_hdr.south) -- (r_f16 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F16--35} [0.3079--0.3358\,s]: \texttt{HTTP 200 OK} + \qty{15470}{\byte} HTML\\[1.8pt]
+        \qty{1260}{\byte} MSS TLS segments (\qty{19136}{\byte} total srv seq)%
+    };
+
+\draw[msg_ack, color=figTwoDataAccent] (r_f18 -| client_hdr.south) -- (r_f18 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F18,21,24,27,30,33}: Client \texttt{[ACK]} Feedback (Win=65280)%
+    };
+
+\draw[msg_arrow, color=figTwoFinAccent] (r_f35 -| server_hdr.south) -- (r_f35 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F35} [0.3358\,s]: \texttt{[FIN, PSH, ACK]} Seq=18477, Ack=1684\\[1.8pt]
+        Piggybacked final \qty{658}{\byte} TLS chunk%
+    };
+
+\draw[msg_ack, color=figTwoFinAccent] (r_f36 -| client_hdr.south) -- (r_f36 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F36} [0.3360\,s]: \texttt{[ACK]} Seq=1684, Ack=19136%
+    };
+
+\draw[msg_arrow, color=figTwoFinAccent] (r_f37 -| client_hdr.south) -- (r_f37 -| server_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F37} [0.6367\,s]: \texttt{[FIN, ACK]} Seq=1684, Ack=19136%
+    };
+
+\draw[msg_ack, color=figTwoFinAccent] (r_f38 -| server_hdr.south) -- (r_f38 -| client_hdr.south)
+    node[midway, msg_label, text width=6.15cm] {%
+        \textbf{F38} [0.6476\,s]: \texttt{[ACK]} Seq=19136, Ack=1685%
+    };
+
+\coordinate (p0_mid) at ($(r_p0_top)!0.5!(r_p0_bot)$);
+\coordinate (p1_mid) at ($(r_p1_top)!0.5!(r_p1_bot)$);
+\coordinate (p2_mid) at ($(r_p2_top)!0.5!(r_p2_bot)$);
+\coordinate (p3_mid) at ($(r_p3_top)!0.5!(r_p3_bot)$);
+\coordinate (p4_mid) at ($(r_p4_top)!0.5!(r_p4_bot)$);
+
+\node[phase_badge, fill=figTwoDnsBadge, draw=figTwoDnsAccent, text=figTwoDnsAccent] (b_p0) at (p0_mid)
+    {Phase 0\\[1.5pt]DNS (UDP/53)\\[1.5pt]{\tiny\qty{0.53}{\milli\second}}};
+\node[phase_badge, fill=figTwoTcpBadge, draw=figTwoTcpAccent, text=figTwoTcpAccent] (b_p1) at (p1_mid)
+    {Phase 1\\[1.5pt]TCP 3-Way\\[1.5pt]{\tiny\qty{14.21}{\milli\second} RTT}};
+\node[phase_badge, fill=figTwoTlsBadge, draw=figTwoTlsAccent, text=figTwoTlsAccent] (b_p2) at (p2_mid)
+    {Phase 2\\[1.5pt]TLS 1.3 1-RTT\\[1.5pt]{\tiny + HTTP GET}};
+\node[phase_badge, fill=figTwoDataBadge, draw=figTwoDataAccent, text=figTwoDataAccent] (b_p3) at (p3_mid)
+    {Phase 3\\[1.5pt]HTTP Data\\[1.5pt]{\tiny\qty{15470}{\byte} HTML}};
+\node[phase_badge, fill=figTwoFinBadge, draw=figTwoFinAccent, text=figTwoFinAccent] (b_p4) at (p4_mid)
+    {Phase 4\\[1.5pt]FIN Teardown\\[1.5pt]{\tiny 4-Way (0 RST)}};
+
+\node[telemetry_card, anchor=east, draw=figTwoTcpAccent!65] (card_p1) at (p1_mid -| dns_hdr.east) {%
+    \textbf{\color{figTwoTcpAccent}TCP Handshake Metrics}\\[2.4pt]
+    -- RTT: \qty{14.21}{\milli\second} (F3 $\to$ F4)\\[2.2pt]
+    -- MSS: \qty{1260}{\byte}, WS=256, SACK\_PERM\\[2.2pt]
+    -- State: \texttt{ESTABLISHED} at \qty{0.2536}{\second}%
+};
+
+\node[telemetry_card, anchor=east, draw=figTwoTlsAccent!65] (card_p2) at (p2_mid -| dns_hdr.east) {%
+    \textbf{\color{figTwoTlsAccent}TLS 1.3 Cryptographic Negotiation}\\[2.4pt]
+    -- Cipher: \texttt{TLS\_AES\_256\_GCM\_SHA384}\\[2.2pt]
+    -- Trust: X.509 (\texttt{COIL Group 2 Root CA})\\[2.2pt]
+    -- Control ACKs: F8 (Srv), F11 (Cli)%
+};
+
+\node[telemetry_card, anchor=east, draw=figTwoDataAccent!65] (card_p3) at (p3_mid -| dns_hdr.east) {%
+    \textbf{\color{figTwoDataAccent}Application Payload Delivery}\\[2.4pt]
+    -- HTML Body: \qty{15470}{\byte} (\texttt{/seneca/})\\[2.2pt]
+    -- Total Server Seq: \qty{19136}{\byte} (\qty{1260}{\byte} MSS)\\[2.2pt]
+    -- Burst Span: \qty{27.9}{\milli\second} (F16 $\to$ F35)%
+};
+
+\node[telemetry_card, anchor=east, draw=figTwoFinAccent!65] (card_p4) at (p4_mid -| dns_hdr.east) {%
+    \textbf{\color{figTwoFinAccent}Graceful Teardown Summary}\\[2.4pt]
+    -- Clean 4-Way FIN Close (\textbf{Zero RST})\\[2.2pt]
+    -- Idle Hold: \qty{300.7}{\milli\second} (F36 $\to$ F37)\\[2.2pt]
+    -- HTTPS Duration: \qty{408.3}{\milli\second} (F3--F38)%
+};
+
+\begin{scope}[on background layer]
+    \node[fill=figTwoDnsFill, draw=figTwoDnsAccent!35, rounded corners=3pt, inner xsep=5pt, inner ysep=3pt,
+          fit=(r_p0_top) (r_p0_bot) (b_p0) (dns_hdr.east |- r_p0_top) (dns_done)] (band_p0) {};
+    \node[fill=figTwoTcpFill, draw=figTwoTcpAccent!35, rounded corners=3pt, inner xsep=5pt, inner ysep=3pt,
+          fit=(r_p1_top) (r_p1_bot) (b_p1) (card_p1) (dns_hdr.east |- r_p1_top)] (band_p1) {};
+    \node[fill=figTwoTlsFill, draw=figTwoTlsAccent!35, rounded corners=3pt, inner xsep=5pt, inner ysep=3pt,
+          fit=(r_p2_top) (r_p2_bot) (b_p2) (card_p2) (dns_hdr.east |- r_p2_top)] (band_p2) {};
+    \node[fill=figTwoDataFill, draw=figTwoDataAccent!35, rounded corners=3pt, inner xsep=5pt, inner ysep=3pt,
+          fit=(r_p3_top) (r_p3_bot) (b_p3) (card_p3) (dns_hdr.east |- r_p3_top)] (band_p3) {};
+    \node[fill=figTwoFinFill, draw=figTwoFinAccent!35, rounded corners=3pt, inner xsep=5pt, inner ysep=3pt,
+          fit=(r_p4_top) (r_p4_bot) (b_p4) (card_p4) (dns_hdr.east |- r_p4_top)] (band_p4) {};
+\end{scope}
+
+\path let \p1 = (band_p4.west), \p2 = (band_p4.east),
+          \n1 = {\x2 - \x1 - 12pt} in
+    node[rectangle, rounded corners=2.5pt, draw=figTwoRule, fill=figTwoSlate!4,
+         anchor=north, inner xsep=6pt, inner ysep=4.5pt, font=\scriptsize, text=figTwoMuted,
+         text width=\n1, align=center] (legend_bar)
+         at ($(band_p4.south |- client_foot.south)+(0,-0.22)$) {%
+        \textbf{Capture:} \texttt{coil\_sdwan\_https\_traffic.pcapng} (\qty{24.81}{\kilo\byte}, ZeroTier \texttt{172.22.0.0/16})
+        \;\textbar\;
+        \textbf{Arrows:} Solid = Data/Ctrl \;\textbar\; Dashed = TCP ACK \;\textbar\; Thick = TLS Burst%
+    };
+
+\end{tikzpicture}%
+}
+\caption{End-to-end packet sequence diagram reconstructed from \texttt{coil\_sdwan\_https\_traffic.pcapng} (\qty{24.81}{\kilo\byte}), illustrating Phase~0 authoritative DNS resolution (Frames~1--2, \qty{0.53}{\milli\second}), Phase~1 TCP three-way handshake (Frames~3--5, \qty{14.21}{\milli\second} RTT, MSS~\qty{1260}{\byte}), Phase~2 TLS~1.3 1-RTT negotiation (\texttt{TLS\_AES\_256\_GCM\_SHA384}) and encrypted \texttt{GET /seneca/} request (Frames~6--15), Phase~3 application payload delivery (\qty{15470}{\byte} HTML across Frames~16--35), and Phase~4 graceful four-way FIN teardown (Frames~35--38, zero \texttt{RST}).}
+\label{fig:tcp_tls_sequence}
+\end{figure*}

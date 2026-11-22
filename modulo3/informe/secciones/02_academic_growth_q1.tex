@@ -1,0 +1,53 @@
+\section{Part 2: Academic Growth and Development (5\%)}
+
+\subsection{Question 1: Project Responsibilities and New Technical Skills (2.5\%)}
+
+\begin{tcolorbox}[
+    colback=LightPanel,
+    colframe=BorderGray,
+    boxrule=0.7pt,
+    arc=3pt,
+    left=9pt,
+    right=9pt,
+    top=6pt,
+    bottom=6pt
+]
+\textbf{Prompt:} \textit{``Through the course of the COIL project and your participation in it, explain which part(s) of the project you were responsible for, and what new technical skills you have developed while completing your portion of the project.''}
+\end{tcolorbox}
+
+Because our assigned Seneca Polytechnic counterparts never established contact, the technical workload of COIL Group~2 had to be absorbed entirely by our two-person team at Universidad de los Llanos. Within our internal division of responsibilities, my partner Luis Alejandro Le\'on Vel\'asquez owned ZeroTier Central network administration and external physical client testing (\texttt{f6fcd4ce4d} at \texttt{172.22.100.10/16}), while I assumed architectural and implementation ownership for the core networking, cryptographic, web application, packet-inspection, and documentation layers of the project.
+
+Specifically, I was responsible for five integrated subsystems. First, I designed and operated the host overlay topology on ZeroTier Network ID \texttt{abfd31bd47affa39} (\texttt{172.22.0.0/16}), deploying both the primary server node (\texttt{aed30a4fdd}, \texttt{172.22.201.2/16}) and a secondary node (\texttt{1c84e39095}, \texttt{172.22.31.69/16}) that simulated the missing Seneca gateway so cross-node verification remained authentic. Second, I programmed the multi-threaded dual-protocol web server (\texttt{server\_https.py}) listening on ports 80 and 443, and developed the responsive HTML5/CSS3 gateway portal alongside both the UniLlanos and Seneca cultural intranets. Third, to fulfill the strict HTTPS requirement and achieve the bonus trust criteria, I designed an internal Public Key Infrastructure (\texttt{openssl.cnf}), generated a 2048-bit RSA Root Certificate Authority (\texttt{COIL Group 2 Root CA}), and issued Subject Alternative Name (SAN) leaf certificates covering every domain and virtual IP. Fourth, I absorbed Seneca's originally assigned DNS scope by building an RFC-compliant authoritative and forwarding DNS server (\texttt{dns\_server.py}) using \texttt{dnslib} on UDP port~53, complemented by automated PowerShell host-setup and batch launch scripts. Fifth, I captured live SD-WAN traffic in Wireshark (\texttt{coil\_sdwan\_https\_traffic.pcapng}, \SI{19.3}{\kilo\byte}) and authored the formal Module~2 English technical report, four step-by-step manuals, and demonstration scripts.
+
+Completing these subsystems forced me to move beyond textbook theory and develop several practical systems-engineering skills through real troubleshooting:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=4pt]
+    \item \textbf{RFC-Compliant DNS Engineering and Mobile Diagnostics:} While testing smartphone access over ZeroTier (\texttt{172.22.201.50}), Android's \texttt{netd} resolver failed with \texttt{FORMERR} because initial responses lacked authoritative \texttt{SOA} records on \texttt{NODATA} replies for IPv6 (\texttt{AAAA}) and \texttt{HTTPS} (Type~65) queries. I also diagnosed a ZeroTier Search Domain suffix loop (\texttt{www.coil-group2.com.coil-group2.com}) triggering \texttt{DNS\_PROBE\_STARTED}, and cleared a Windows \texttt{SharedAccess} (ICS) UDP~53 port conflict.
+    \item \textbf{Concurrent TLS Socket Handling:} Standard synchronous SSL wrapping blocks the server accept loop when clients probe and stall, and calling \texttt{shutdown(SHUT\_WR)} on wrapped Windows TLS sockets can emit TCP \texttt{RST} frames that trigger \texttt{ERR\_CONNECTION\_CLOSED}. Implementing \texttt{NonBlockingSSLThreadingServer} with worker-thread handshakes and bounded timeouts taught me production-safe TLS concurrency.
+    \item \textbf{Custom X.509 v3 PKI and OS Trust Stores:} Configuring \texttt{basicConstraints}, \texttt{authorityKeyIdentifier}, and SAN entries in OpenSSL, then automating Root CA installation into Windows (\texttt{Cert:\textbackslash LocalMachine\textbackslash Root}) and Android, gave me hands-on mastery of browser trust chains.
+    \item \textbf{Overlay MTU Tuning and Deep Packet Inspection:} Tuning ZeroTier's virtual interface MTU to \SI{1300}{bytes} prevented cellular fragmentation, adjusting Windows firewall interface profiles from \texttt{Public} to \texttt{Private} unblocked inbound routing, and applying Wireshark display filters (\texttt{ip.addr == 172.22.31.69 and tcp.port == 443}) sharpened my ability to audit TCP 3-way handshakes, TLS~1.3 1-RTT exchanges (\texttt{X25519}, \texttt{TLS\_AES\_256\_GCM\_SHA384}), and orderly \texttt{FIN/ACK} teardowns.
+\end{itemize}
+
+Table~\ref{tab:responsibilities_skills} maps each project responsibility directly to its concrete deliverable and the engineering competencies acquired.
+
+\begin{table}[H]
+\centering
+\caption{Summary of Miguel \'Angel Rodr\'iguez Payares's Technical Responsibilities and Acquired Skills.}
+\label{tab:responsibilities_skills}
+\small
+\begin{tabularx}{\textwidth}{@{} >{\bfseries\raggedright\arraybackslash}p{2.9cm} >{\raggedright\arraybackslash}p{5.55cm} >{\raggedright\arraybackslash}X @{}}
+\toprule
+\textbf{Subsystem} & \textbf{Concrete Deliverables} & \textbf{New Technical Skills Developed} \\
+\midrule
+SD-WAN Overlay \& Firewalling & ZeroTier \texttt{abfd31bd47affa39} host (\texttt{172.22.201.2}) and simulated gateway (\texttt{172.22.31.69}) & Virtual interface MTU tuning (\SI{1300}{bytes}), Windows \texttt{Private} profile routing, and cross-node ICMP diagnostics. \\
+\addlinespace[4pt]
+Authoritative DNS Service & \path{dns_server.py} (\texttt{dnslib}), \path{setup_hosts.ps1}, and \path{iniciar_pagina.bat} & RFC~1035/2308 \texttt{SOA} \texttt{NODATA} handling for \texttt{AAAA}/Type~65, upstream forwarding, and UDP~53 port conflict recovery. \\
+\addlinespace[4pt]
+Custom PKI \& TLS~1.3 & \texttt{openssl.cnf}, \path{COIL_Group2_Root_CA.crt}, SAN cert, and \path{install_root_ca.ps1} & X.509 v3 Root CA chaining, multi-SAN signing, and Windows/Android trust-store deployment (bonus compliance). \\
+\addlinespace[4pt]
+Multi-Tenant Web Server & \path{server_https.py}, gateway portal, \texttt{/unillanos/}, and \texttt{/seneca/} frontends & Thread-safe non-blocking TLS wrapping, dual HTTP/HTTPS sockets, host/path routing, and responsive HTML5/CSS3 design. \\
+\addlinespace[4pt]
+Traffic Audit \& Documentation & \texttt{coil\_\-sdwan\_\-https\_\-traffic.pcapng}, 4~Wireshark screenshots, report, and scripts & Boolean packet filtering, TLS~1.3 cipher/SNI dissection, TCP state-machine verification, and formal English technical writing. \\
+\bottomrule
+\end{tabularx}
+\end{table}

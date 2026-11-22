@@ -1,0 +1,124 @@
+\documentclass[11pt,letterpaper]{article}
+
+% --- Encoding & Language ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+% --- Page Geometry ---
+\usepackage{geometry}
+\geometry{top=2.0cm, bottom=2.0cm, left=2.2cm, right=2.2cm}
+
+% --- Typography & Microtypography ---
+\usepackage{lmodern}
+\usepackage{microtype}
+\emergencystretch=1.5em
+\tolerance=1000
+\raggedbottom
+
+% --- Mathematics & Units ---
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol}
+
+% --- Color Palette ---
+\usepackage{xcolor}
+\definecolor{NavyPrimary}{HTML}{1B365D}
+\definecolor{TealAccent}{HTML}{0F766E}
+\definecolor{TealBg}{HTML}{F0FDFA}
+\definecolor{AmberWarn}{HTML}{B45309}
+\definecolor{AmberBg}{HTML}{FFFBEB}
+\definecolor{SlateText}{HTML}{334155}
+\definecolor{LightPanel}{HTML}{F8FAFC}
+\definecolor{BorderGray}{HTML}{CBD5E1}
+
+% --- Tables, Lists & Graphics ---
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc, shapes.geometric}
+
+% --- Callout Boxes ---
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+% --- Section Headings ---
+\usepackage{titlesec}
+\titleformat{\section}
+    {\Large\bfseries\color{NavyPrimary}}
+    {\thesection.}{0.5em}{}
+    [\vspace{-0.4em}\color{NavyPrimary}\rule{\textwidth}{0.8pt}]
+\titleformat{\subsection}
+    {\large\bfseries\color{TealAccent}}
+    {\thesubsection}{0.5em}{}
+
+% --- Headers & Footers ---
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\setlength{\footskip}{26pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{SlateText}COIL Project --- Module 3 Individual Reflection (10\%)}
+\fancyhead[R]{\small\color{SlateText}Miguel \'Angel Rodr\'iguez Payares (161004834)}
+\fancyfoot[L]{\small\color{SlateText}Universidad de los Llanos \textbullet\ Sistemas de Comunicaci\'on 2}
+\fancyfoot[R]{\small\color{SlateText}Page \thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% --- Hyperlinks ---
+\usepackage{xurl}
+\usepackage[
+    colorlinks=true,
+    linkcolor=NavyPrimary,
+    citecolor=NavyPrimary,
+    urlcolor=TealAccent,
+    pdftitle={COIL Project - Module 3 Individual Reflection},
+    pdfauthor={Miguel Angel Rodriguez Payares}
+]{hyperref}
+
+\begin{document}
+
+% --- Executive Academic Title Banner ---
+\thispagestyle{plain}
+\begin{tcolorbox}[
+    enhanced,
+    colback=NavyPrimary,
+    colframe=NavyPrimary,
+    arc=4pt,
+    left=12pt,
+    right=12pt,
+    top=9pt,
+    bottom=9pt
+]
+{\color{white}\large\bfseries COIL International Exchange --- Module 3 Individual Reflection (10\%)}\\[2pt]
+{\color{BorderGray}\small Lessons Learned from COIL: Critical Incident Analysis and Academic Growth}\\[6pt]
+{\color{white}\footnotesize
+\textbf{Student:} Miguel \'Angel Rodr\'iguez Payares (ID: 161004834) \quad|\quad \textbf{Program:} Electronic Engineering (10th Semester)\\
+\textbf{Institutions:} Universidad de los Llanos (Colombia) \& Seneca Polytechnic (Canada) \quad|\quad \textbf{Course:} Sistemas de Comunicaci\'on 2\\
+\textbf{Team:} Group 2 \quad|\quad \textbf{Submission Window:} November 16 -- November 22, 2026
+}
+\end{tcolorbox}
+
+\vspace{0.1cm}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{@{} >{\bfseries}l >{\raggedright\arraybackslash}X >{\bfseries}l @{}}
+\toprule
+\textbf{Module Component} & \textbf{Included Deliverable} & \textbf{Weight} \\
+\midrule
+Part 1: Critical Incident Analysis & Option A (300-word formal essay) + Option B (1-minute video script, 146~words) & 5\% \\
+Part 2: Academic Growth \& Development & Detailed responses to Question~1 (2.5\%) and Question~2 (2.5\%) & 5\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\input{secciones/01_critical_incident.tex}
+\input{secciones/02_academic_growth_q1.tex}
+\input{secciones/03_group_contract_q2.tex}
+
+\end{document}

@@ -1,0 +1,141 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Modern academic collaborations increasingly rely on distributed laboratory infrastructures in which students and faculty must securely share private web applications, telemetry, and naming services across institutional boundaries. Within Module~2 of the \textit{Sistemas de Comunicaci\'{o}n~2} course, a Collaborative Online International Learning (COIL) partnership between Universidad de los Llanos (Villavicencio, Meta, Colombia) and Seneca Polytechnic (Toronto, Ontario, Canada) requires interconnecting geographically separated hosts so that participants at each institution can navigate cultural intranet portals deployed by their counterparts.
+
+Directly exposing local development servers across residential and campus networks introduces severe architectural obstacles, including symmetric Network Address Translation (NAT), carrier-grade address sharing, restrictive campus firewalls, and ephemeral public IPv4 leases \cite{tanenbaum2021,kurose2017}. Furthermore, relying on raw IP addresses, unencrypted HTTP transport, or untrusted self-signed certificates degrades usability and fails enterprise security baselines. To overcome these limitations without dedicated site-to-site VPN hardware, COIL Group~2 engineered a unified Software-Defined Wide Area Network (SD-WAN) overlay coupled with a private Public Key Infrastructure (PKI), authoritative DNS resolution, and packet-level forensic validation \cite{zerotier2024}.
+
+The implementation satisfies four measurable engineering objectives:
+\begin{enumerate}
+    \item \textbf{Private SD-WAN Overlay Interconnection:} Deploy a cryptographically authenticated ZeroTier Layer-2/Layer-3 overlay network over the \texttt{172.22.0.0/16} subnet with an interface Maximum Transmission Unit (MTU) of \qty{1300}{\byte}, strict private admission (\num{5}/\num{10} authorized endpoints, zero unauthorized hosts), explicit student and server labeling, and verified peer-to-peer ICMP reachability \cite{zerotier2024}.
+    \item \textbf{Dual Cultural Intranets under HTTPS/TLS~1.3 with Custom Root CA Trust:} Serve responsive institutional cultural intranets for Universidad de los Llanos and Seneca Polytechnic over HTTPS (TLS~1.3) backed by a custom Root Certificate Authority (\texttt{COIL Group 2 Root CA}) installed in client operating system trust stores to eliminate browser security warnings (rubric bonus criterion).
+    \item \textbf{Authoritative DNS Domain Resolution:} Operate an authoritative UDP port~53 DNS service resolving institutional project domains (\texttt{www.coil-group2.com} and subdomains) across the SD-WAN mesh while forwarding external queries upstream, eliminating manual IP-based access.
+    \item \textbf{Wireshark Packet Forensics ($< \qty{10}{\mega\byte}$):} Capture live HTTPS client-server traffic over the ZeroTier virtual interface into a compact \texttt{.pcapng} trace strictly below \qty{10}{\mega\byte}, verifying TCP three-way handshakes, TLS~1.3 negotiation and encrypted payload delivery, and graceful connection teardowns.
+\end{enumerate}
+
+The remainder of this report documents the ZeroTier SD-WAN IP allocation and verification evidence (Rubric Section~I), individual English-narrated demonstration videos (Rubric Section~II), Wireshark packet dissection (Rubric Section~III), step-by-step deployment manuals covering SD-WAN, web hosting, PKI trust, and DNS resolution (Rubric Section~IV), and concluding quantitative findings alongside the complete project source code in the appendices.
+
+\section{ZeroTier SD-WAN IP Assignment and Node Labeling}
+\label{sec:zerotier_sdwan}
+
+Addressing Rubric Section~I (\qty{5}{\percent}), this section presents the overlay network architecture, the complete authorized node registry, compliance with student and web-server labeling rules, and empirical reachability measurements across desktop and mobile endpoints. Step-by-step provisioning commands and controller configuration workflows are deferred to Manual~1 in Section~IV to avoid procedural duplication.
+
+\subsection{SD-WAN Overlay Architecture and Addressing Plan}
+\label{subsec:sdwan_architecture}
+
+ZeroTier abstracts physical WAN diversity into a flat virtual Ethernet broadcast domain by decoupling the underlay transport (Virtual Layer~1, VL1) from virtualized switching and addressing (Virtual Layer~2, VL2) \cite{zerotier2024}. Each endpoint generates a cryptographic public/private key pair whose hash forms a unique 40-bit (10-hexadecimal-character) Node ID, enabling authenticated UDP encapsulation and NAT hole punching across disparate residential ISPs without central traffic hairpins \cite{zerotier2024,kurose2017}.
+
+For the COIL Group~2 deployment, the private overlay network ``COIL Group 2 SD-WAN - UniLlanos \& Seneca'' was provisioned under Network ID \texttt{abfd31bd47affa39} with \textit{Private} access control enabled, ensuring that packets from unapproved endpoints are dropped at the controller plane. All authorized interfaces operate on the managed IPv4 prefix \texttt{172.22.0.0/16} with a virtual interface MTU of \qty{1300}{\byte}. Selecting a \qty{1300}{\byte} overlay MTU provides sufficient headroom beneath standard \qty{1500}{\byte} physical Ethernet and PPPoE underlay links to accommodate VL1 UDP/cryptographic encapsulation overhead without outer IP fragmentation \cite{tanenbaum2021,zerotier2024}. At the time of verification, the network held \num{5}/\num{10} included device slots, comprising \num{5} authorized nodes and \num{0} unauthorized nodes (\num{3} active desktop hosts and \num{2} inactive mobile devices).
+
+\input{figuras/fig_sdwan_topology.tex}
+
+As illustrated in Fig.~\ref{fig:sdwan_topology}, the virtual \texttt{172.22.0.0/16} switching fabric logically unifies the UniLlanos multi-tenant HTTPS and authoritative DNS host (\texttt{172.22.201.2/16}), the simulated Seneca Polytechnic gateway (\texttt{172.22.31.69/16}), and the remote student desktop and Android clients across physical WAN boundaries.
+
+\subsection{Authorized Member Registry and Node Labeling Compliance}
+\label{subsec:member_registry}
+
+Rubric Section~I mandates that every group member connect a host to the SD-WAN, that each node carry an explicit label bearing the corresponding student's name, and that the web server host explicitly declare its hosting role. Table~\ref{tab:zerotier_members} compiles the authoritative registry of all five enrolled endpoints observed in ZeroTier Central.
+
+\begin{table*}[t]
+\centering
+\caption{ZeroTier Central Authorized Member Registry for Network \texttt{abfd31bd47affa39} (\texttt{COIL Group 2 SD-WAN - UniLlanos \& Seneca}).}
+\label{tab:zerotier_members}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+\textbf{Node ID / Virtual MAC} & \textbf{Assigned Label / Role} & \textbf{OS / Arch (Client)} & \textbf{Managed Overlay IP(s)} & \textbf{Physical Endpoint} & \textbf{Auth} & \textbf{Activity (Last Seen)} \\
+\midrule
+\begin{tabular}[c]{@{}l@{}}\texttt{1c84e39095}\\{\scriptsize\texttt{3a:e6:2b:a4:2d:a4}}\end{tabular} &
+\texttt{Seneca College - Simulated Gateway} &
+Windows \texttt{x86\_64} (\texttt{v1.16.2}) &
+\texttt{172.22.31.69/16} &
+\texttt{181.51.34.123} &
+Yes &
+Active (\qty{1}{\minute}) \\
+\addlinespace[3pt]
+\begin{tabular}[c]{@{}l@{}}\texttt{aed30a4fdd}\\{\scriptsize\texttt{3a:54:7c:4d:f2:ec}}\end{tabular} &
+\texttt{Miguel Rodriguez - Unillanos Website Server} &
+Windows \texttt{x86\_64} (\texttt{v1.16.2}) &
+\texttt{172.22.201.2/16} &
+\texttt{181.51.34.123} &
+Yes &
+Active (\qty{1}{\minute}) \\
+\addlinespace[3pt]
+\begin{tabular}[c]{@{}l@{}}\texttt{b63d8aeba8}\\{\scriptsize\texttt{3a:4c:92:cd:56:99}}\end{tabular} &
+\texttt{Luis Alejandro Leon - Student Client} &
+Windows \texttt{x86\_64} (\texttt{v1.16.2}) &
+\begin{tabular}[c]{@{}l@{}}\texttt{172.22.100.11}\\\texttt{172.22.164.74}\end{tabular} &
+\texttt{181.51.34.104} &
+Yes &
+Active (\qty{1}{\minute}) \\
+\addlinespace[3pt]
+\begin{tabular}[c]{@{}l@{}}\texttt{8eb3130d2c}\\{\scriptsize\texttt{3a:74:1c:54:b0:1d}}\end{tabular} &
+\texttt{Miguel Rodriguez - Student Client} &
+Android \texttt{arm64} (\texttt{v1.16.0}) &
+\begin{tabular}[c]{@{}l@{}}\texttt{172.22.38.108}\\\texttt{172.22.201.50}\end{tabular} &
+\texttt{181.51.34.123} &
+Yes &
+Inactive (\qty{2}{\hour}) \\
+\addlinespace[3pt]
+\begin{tabular}[c]{@{}l@{}}\texttt{f6fcd4ce4d}\\{\scriptsize\texttt{3a:0c:53:93:73:7c}}\end{tabular} &
+\texttt{Luis Alejandro Leon - Student Client} &
+Android \texttt{arm64} (\texttt{v1.16.0}) &
+\texttt{172.22.100.10} &
+\texttt{181.51.34.104} &
+Yes &
+Inactive (\qty{37}{\minute}) \\
+\bottomrule
+\end{tabular}%
+}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figuras/zerotier_members_fresh.png}
+\caption{ZeroTier Central member management console for Network ID \texttt{abfd31bd47affa39}, confirming \num{5}/\num{10} included devices, \num{5} authorized nodes (\num{0} unauthorized), institutional node labeling, managed \texttt{172.22.x.x} IP assignments, and underlay public endpoints.}
+\label{fig:zerotier_members}
+\end{figure*}
+
+Fig.~\ref{fig:zerotier_members} corroborates every entry in Table~\ref{tab:zerotier_members} directly from the ZeroTier Central web console. Notice that all five green authorization checkboxes are active (\textit{Authorized (5)}, \textit{Not authorized (0)}), while the activity filter reflects three active Windows~\texttt{x86\_64} nodes running ZeroTier~\texttt{v1.16.2} (seen \qty{1}{\minute} prior) and two Android~\texttt{arm64} handsets running \texttt{v1.16.0} (last seen \qty{37}{\minute} and \qty{2}{\hour} prior). Node \texttt{aed30a4fdd} explicitly identifies its hosting role (``Miguel Rodriguez - Unillanos Website Server'') at \texttt{172.22.201.2/16}, whereas \texttt{1c84e39095} fulfills the simulated partner endpoint role (``Seneca College - Simulated Gateway'') at \texttt{172.22.31.69/16}. Both students also maintain dedicated client workstations and Android test devices under their full names (``Luis Alejandro Leon - Student Client'' and ``Miguel Rodriguez - Student Client''). Examining the underlay column confirms two distinct public ISP ingress addresses (\texttt{181.51.34.123} and \texttt{181.51.34.104}), verifying real cross-ISP WAN operation between the server host and Luis Alejandro Le\'{o}n's client nodes. Two multi-leased nodes (\texttt{b63d8aeba8} and \texttt{8eb3130d2c}) retain secondary \texttt{172.22.x.x} leases in the controller database from prior interface re-bindings, whereas the server and gateway maintain deterministic single-address leases.
+
+\subsection{Host Interface Verification and ICMP Reachability}
+\label{subsec:icmp_reachability}
+
+Controller-side IP allocation must match the virtual network interface state bound inside each host operating system. Fig.~\ref{fig:host_ip_verification} documents the local host interface verification confirming that the virtual ZeroTier adapter binds the assigned \texttt{172.22.0.0/16} address and prefix mask locally without conflicting with physical Ethernet or Wi-Fi adapters.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.92\textwidth]{figuras/host_ip_verification_fresh.png}
+\caption{Local host network interface verification confirming active ZeroTier One virtual adapter binding within the \texttt{172.22.0.0/16} SD-WAN overlay subnet.}
+\label{fig:host_ip_verification}
+\end{figure*}
+
+To verify bidirectional Layer-3 forwarding across the encrypted SD-WAN mesh, live ICMP echo probes were executed from the UniLlanos web server (\texttt{172.22.201.2}) and the simulated Seneca gateway (\texttt{172.22.31.69}) toward both local and remote participant IP addresses. Table~\ref{tab:icmp_rtt} summarizes the measured round-trip time (RTT) distributions and packet-loss ratios.
+
+\begin{table}[t]
+\centering
+\caption{Live ICMP Round-Trip Time (RTT) and Packet Loss Verification Across the ZeroTier SD-WAN.}
+\label{tab:icmp_rtt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+\textbf{Probe Path (Src $\rightarrow$ Dst)} & \textbf{Link Type} & \textbf{Min} & \textbf{Max} & \textbf{Avg} & \textbf{Loss} \\
+\midrule
+\texttt{172.22.201.2} $\rightarrow$ \texttt{172.22.31.69} & LAN P2P & \qty{3}{\milli\second} & \qty{31}{\milli\second} & \qty{10}{\milli\second} & \qty{0}{\percent} \\
+\texttt{172.22.31.69} $\rightarrow$ \texttt{172.22.201.2} & LAN P2P (rev.) & \qty{3}{\milli\second} & \qty{10}{\milli\second} & \qty{6}{\milli\second} & \qty{0}{\percent} \\
+\texttt{172.22.201.2} $\rightarrow$ \texttt{172.22.100.11} & WAN P2P & \qty{16}{\milli\second} & \qty{70}{\milli\second} & \qty{31}{\milli\second} & \qty{0}{\percent} \\
+\texttt{172.22.201.2} $\rightarrow$ \texttt{172.22.164.74} & WAN P2P & \qty{19}{\milli\second} & \qty{28}{\milli\second} & \qty{23}{\milli\second} & \qty{0}{\percent} \\
+\texttt{172.22.201.2} $\rightarrow$ \texttt{172.22.100.10} & Android idle\textsuperscript{*} & -- & -- & -- & \qty{75}{\percent} \\
+\bottomrule
+\end{tabular}%
+}
+\vspace{3pt}
+\par\noindent\parbox{\columnwidth}{\footnotesize\textsuperscript{*}1/4 packets received; \textit{Destination Host Unreachable} observed while the mobile screen remained locked.}
+\end{table}
+
+The telemetry in Table~\ref{tab:icmp_rtt} reveals three distinct operational regimes across the overlay topology:
+\begin{enumerate}
+    \item \textbf{Local Peer-to-Peer (LAN P2P) Forwarding:} Forward and reverse probes between \texttt{172.22.201.2} and \texttt{172.22.31.69} achieve \qty{0}{\percent} packet loss with a minimum RTT of \qty{3}{\milli\second} and average RTTs of \qty{10}{\milli\second} (forward) and \qty{6}{\milli\second} (reverse). Because both Windows nodes sit behind the same physical endpoint (\texttt{181.51.34.123}), ZeroTier VL1 resolves a direct local UDP path without traversing external root relays \cite{zerotier2024}.
+    \item \textbf{Cross-ISP Peer-to-Peer (WAN P2P) Tunneling:} Probes from \texttt{172.22.201.2} (\texttt{181.51.34.123}) to both managed addresses of Luis Alejandro Le\'{o}n's Windows client (\texttt{172.22.100.11} and \texttt{172.22.164.74} behind \texttt{181.51.34.104}) record \qty{0}{\percent} loss with average RTTs of \qty{31}{\milli\second} (range \qtyrange{16}{70}{\milli\second}) and \qty{23}{\milli\second} (range \qtyrange{19}{28}{\milli\second}), respectively. These sub-\qty{35}{\milli\second} averages confirm direct encrypted UDP traversal across distinct ISP networks.
+    \item \textbf{Mobile Power-Management Behavior:} Probing the Android handset at \texttt{172.22.100.10} (node \texttt{f6fcd4ce4d}, marked inactive \qty{37}{\minute} prior in Fig.~\ref{fig:zerotier_members}) produced \qty{75}{\percent} packet loss (\num{1}/\num{4} echo replies received, with \textit{Destination Host Unreachable} reported while the screen was locked). This behavior reflects Android background VPN sleep throttling rather than an SD-WAN addressing fault, as active screen interaction restores immediate Layer-3 reachability for mobile HTTPS and root CA verification.
+\end{enumerate}
