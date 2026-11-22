@@ -71,16 +71,15 @@ echo %DNS_STATUS%
 curl.exe -skI --max-time 2 https://127.0.0.1/ 2>nul | findstr /C:"200 OK" >nul 2>&1
 if not errorlevel 1 goto :web_already_running
 
-echo [INFO] Reiniciando servidor web HTTP/HTTPS...
-powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter 'Name like ''python%''' | Where-Object { $_.CommandLine -match 'server_https\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
-timeout /t 1 /nobreak >nul
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter 'Name = ''python.exe'' OR Name = ''pythonw.exe''' | Where-Object { $_.CommandLine -match 'server_https\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+ping -n 2 127.0.0.1 >nul 2>&1
 
 powershell -NoProfile -Command "$q=[char]34; $w='%PYTHONW_EXE%'; $d=(Get-Location).Path; $c=$q+$w+$q+' -u '+$q+$d+'\modulo2\servidor\server_https.py'+$q; Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine=$c; CurrentDirectory=$d} | Out-Null" >nul 2>&1
 set /a TRIES=0
 
 :wait_web
 if %TRIES% GEQ 8 goto :web_timeout
-timeout /t 1 /nobreak >nul
+ping -n 2 127.0.0.1 >nul 2>&1
 set /a TRIES+=1
 curl.exe -skI --max-time 2 https://127.0.0.1/ 2>nul | findstr /C:"200 OK" >nul 2>&1
 if errorlevel 1 goto :wait_web
@@ -133,10 +132,10 @@ start "" "%URL%"
 goto :menu
 
 :stop_servers
-powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter 'Name like ''python%''' | Where-Object { $_.CommandLine -match 'dns_server\.py|server_https\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter 'Name = ''python.exe'' OR Name = ''pythonw.exe''' | Where-Object { $_.CommandLine -match 'dns_server\.py|server_https\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }"
 echo.
 echo [OK] Servidores COIL detenidos.
-timeout /t 2 /nobreak >nul
+ping -n 3 127.0.0.1 >nul 2>&1
 exit /b 0
 
 :exit_keep
